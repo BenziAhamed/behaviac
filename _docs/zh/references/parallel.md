@@ -25,6 +25,9 @@ Parallel 节点可以用来实现所谓‘ context precondition’，如下图�
 
 ![parallel_condition]({{site.url}}{{site.baseurl}}/img/references/parallel_condition.png)
 
-Parallel 节点配置条件节点和其他节点， 并且失败条件是缺省的配置 FAIL_ON_ONE ，那么只有当条件节点成功的时候其他节点才被执行，从而条件节点事实上是其他节点的precondtion。 和 Sequence 的不同之处在于， Sequence 节点实现的 precondition 只是‘进入’其他节点的 precondition，一旦‘进入’开始执行其他节点就不再检查该 precondition 了，而 Parallel 节点实现的 precondition 是‘ context’的，不但‘进入’开始执行前需要检查，之后每次执行也都要检查。
+Parallel 节点配置条件节点和其他节点， 并且失败条件是缺省的配置 FAIL_ON_ONE ，那么只有当条件节点成功的时候其他节点才被执行，从而条件节点事实上是其他节点的precondtion。 （但是需要特别指出的是，作为precondition的这种用法是不严谨的，当条件失败的时候，在Parallel失败之前，后续的节点会多执行一次。请使用前置附件来实现这种precondition的需求）
+
+
+和 Sequence 的不同之处在于， Sequence 节点实现的 precondition 只是‘进入’其他节点的 precondition，一旦‘进入’开始执行其他节点就不再检查该 precondition 了，而 Parallel 节点实现的 precondition 是‘ context’的，不但‘进入’开始执行前需要检查，之后每次执行也都要检查。
 
 具体的执行逻辑可以查看 [behaviortree/nodes/composites/parallel.cpp]({{site.repository}}/blob/master/src/behaviortree/nodes/composites/parallel.cpp)
