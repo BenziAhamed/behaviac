@@ -36,7 +36,7 @@ lang: zh
 
 而3号节点的父节点是2号的Loop节点。
 
-先补充下各节点类型的执行逻辑（详见编辑器Help菜单下“节点参考”文档）：
+先补充下各节点类型的执行逻辑（详见[节点说明](http://www.behaviac.com/docs/zh/references/)）：
 
  - 序列（Sequence）节点：顺序执行所有子节点返回成功，如果某个子节点失败返回失败。
  - 循环（Loop）节点：循环执行子节点到指定次数后返回成功，如果循环次数为-1，则无限循环。
@@ -44,8 +44,9 @@ lang: zh
  - 	动作（Action）节点：根据动作结果返回成功，失败，或运行。
  - 等待（Wait）节点：当指定的时间过去后返回成功。
 
-如果4号条件节点的执行结果是成功，其父节点3号节点则继续执行5号节点，如果5号动作节点返回成功，则执行6号等待节点，如果6号节点返回成功，则3号节点全部执行完毕且会返回成功，那么2号节点继续下个迭代。
-如果4号条件节点的执行结果是失败，其父节点3号节点则返回失败不再继续执行子节点，并且3号节点的父节点2号循环节点结束本次迭代执行下个迭代。
+### 执行说明
+ - 如果4号条件节点的执行结果是成功，其父节点3号节点则继续执行5号节点，如果5号动作节点返回成功，则执行6号等待节点，如果6号节点返回成功，则3号节点全部执行完毕且会返回成功，那么2号节点继续下个迭代。
+ - 如果4号条件节点的执行结果是失败，其父节点3号节点则返回失败不再继续执行子节点，并且2号节点继续下个迭代。
 
 ## 进阶 ##
 聪明的读者可能会问，上面的例子中只讲了成功或失败的情况，但如果动作要持续一段时间呢？如果5号节点，Fire需要持续一段时间呢？
@@ -54,9 +55,12 @@ lang: zh
  - 对于持续运行一段时间的Fire动作，其执行结果持续返回“运行”，结束的时候返回“成功”。
  - 对于持续运行一段时间的Wait动作，其执行结果持续返回“运行”，当等待时间到达的时候返回“成功”。
 
-当节点持续返回“运行”的时候，BT树的内部“知道”该节点是在持续“运行”的，从而在后续的执行过程中“直接”继续执行该节点，而不需要从头开始执行，直到该运行状态的节点返回“成功”或“失败”，从而继续后续的节点。
+当节点持续返回“运行”的时候，BT树的内部“知道”该节点是在持续“运行”的，从而在后续的执行过程中“直接”继续执行该节点，而不需要从头开始执行，直到该运行状态的节点返回“成功”或“失败”，从而继续后续的节点。从外面看，就像“阻塞”在了那个“运行”的节点上，其父节点就像不再管理，要一直等运行的子节点结束的时候，其父节点才再次接管
 
-## 另一个例子 ##
+（请注意，这一段说明只是从概念上这样讲，概念上可以这样理解，实际上即使运行状态的节点每次执行也是要返回的，只是其返回值是运行，其父节点对于返回值是运行状态的节点，将使其继续，所以看上去好像父节点不再管理。）。
+
+
+## 另一个例子 <a name="anotherexample"> </a>
 ![例子2]({{site.url}}{{site.baseurl}}/img/concepts/example2.png)
 如上图，为了清晰说明运行状态，来看另一个例子。在这个例子中，Condition，Action1，Action3是3个函数。
 
@@ -102,8 +106,14 @@ behaviac::EBTStatus CBTPlayer::Action3()
     {
         cout << \" frame " << ++frames << std::endl;
         status = g_player->btexec();
+
+        //other codes
     }
 ```
+
+上面的执行行为树的代码就如同游戏更新部分。`status = g_player->btexec()`是在游戏的更新函数（update或tick）里，需要每帧调用。
+特别的，对于运行状态，即使运行状态概念上讲是“阻塞”在节点，但是依然是每帧需要调用`btexec`，也就是说，其节点依然是每帧都在运行，只是下一帧是继续上一帧，从而表现的是运行状态，在其结束之前，其父节点不会把控制转移给其他后续节点。这里的“阻塞”并非真的被阻塞，并非后续的代码(上面的`other codes`部分)不会被执行。`status = g_player->btexec()`后面如果有代码，依然被执行。
+
 
 执行结果会是个什么样的输出呢？
 
@@ -132,18 +142,29 @@ Loop的第2次迭代开始，就像第1帧的执行。
 
 ![frame4]({{site.url}}{{site.baseurl}}/img/concepts/frame4.png)
 
+
 ## 再进阶 ##
 又有聪明的读者要问了，持续返回“运行”状态的节点固然优化了执行，但其结果就像“阻塞”了BT的执行一样，如果发生了其他“重要”的事情需要处理怎么办？
 
-在behaviac里至少有3种办法。
+在behaviac里至少有多种办法。
 
-### 使用Parallel节点 ###
+### 使用[前置](http://www.behaviac.com/docs/zh/references/attachment/)
+
+![]({{site.url}}{{site.baseurl}}/img/references/preaction.png)
+
+每个节点都可以添加[前置](http://www.behaviac.com/docs/zh/references/attachment/)附件或[后置](http://www.behaviac.com/docs/zh/references/attachment/)附件。
+上图的action节点添加了一个前置，两个后置。
+
+可以添加[前置](http://www.behaviac.com/docs/zh/references/attachment/)附件，并且“执行时机”设为Update或Both，则在每次执行之前都会先执行前置里配置的条件。
+
+
+### 使用[Parallel](http://www.behaviac.com/docs/zh/references/parallel/)节点
 
 ![parallel]({{site.url}}{{site.baseurl}}/img/concepts/parallel.png)
 
 如上图，可以使用Parallel节点来“一边检查条件，一边执行动作”，该条件作为该动作的“Guard”条件。当该条件失败的时候来结束该处于持续运行状态的动作节点。
 
-### 使用SelectorMonitor和WithPrecondition节点 ###
+### 使用[SelectorMonitor](http://www.behaviac.com/docs/zh/references/selectormonitor/)节点
 
 ![selectormonitor]({{site.url}}{{site.baseurl}}/img/concepts/selectormonitor.png)
 
@@ -159,13 +180,14 @@ Loop的第2次迭代开始，就像第1帧的执行。
 
  - 执行每个节点都会有一个结果（成功，失败或运行）
  - 子节点的执行结果由其父节点控制和管理
- - 返回运行结果的节点被视作处于运行状态，处于运行状态的节点接下来被直接运行
+ - 返回运行结果的节点被视作处于运行状态，处于运行状态的节点将被持续执行一直到其返回结束（成功或失败）。在其结束前，其父节点不会把控制转移到后续节点。
 
 其中理解运行状态是理解行为树的关键，也是使用好行为树的关键。
 
 ## 其他 ##
 
-上文**另一个例子**中“demo_running”的例子在安装包里也有提供，安装后在安装目录里可以用vs2013打开“.\ build\vs2013\behaviac.sln”（vs2008，vs2010，gmake，linux等分别对应不同的平台或编译器）查看源码，编译运行，自行尝试体会。
+上文[另一个例子](#anotherexample)中“demo_running”的例子在安装包及源码里都有提供。最好查看源码，编译运行，自行尝试体会。
+可以查看[目录说明](http://www.behaviac.com/docs/zh/articles/directory/)
 
 ![demo_running_project]({{site.url}}{{site.baseurl}}/img/concepts/demo_running_project.png)
 
