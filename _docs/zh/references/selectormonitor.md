@@ -3,7 +3,7 @@ layout: docs_relatives
 title: 选择监测节点
 date: 2016-02-17 16:46:00 +0800
 author: cainhuang
-permalink: /docs/zh/tutorials/selectormonitor/
+permalink: /docs/zh/references/selectormonitor/
 categories: [reference]
 lang: zh
 ---
