@@ -10,6 +10,11 @@ lang: zh
 
 首先说明的是从[下载](https://github.com/TencentOpen/behaviac/releases)下载的BehaviacSetup*.exe是安装包，内含可执行的编辑器及示例。
 
+可能需要下载安装[Microsoft Visual C++ 运行库](https://support.microsoft.com/en-us/kb/2977003)。
+及[.net](https://www.microsoft.com/en-US/download/details.aspx?id=21)。
+
+https://www.microsoft.com/en-us/download/details.aspx?id=40784
+
 这里介绍的是源码的目录结构。从[github](https://github.com/TencentOpen/behaviac)下载或克隆源码。
 
 ## 目录结构图示：

@@ -41,7 +41,13 @@ CPU：Intel I5 2.93G或更高配置
 
 屏幕分辨率：1680*1050
 
-运行BehaviacSetup_***.exe安装包文件，选择安装路径（推荐直接使用默认路径），安装behaviac相关套件。安装完成后，会在桌面生成编辑器的快捷方式，如下图所示：
+运行BehaviacSetup_***.exe安装包文件，选择安装路径（推荐直接使用默认路径），安装behaviac相关套件。
+
+可能需要下载安装[Microsoft Visual C++ 运行库](https://support.microsoft.com/en-us/kb/2977003)。
+及[.net](https://www.microsoft.com/en-US/download/details.aspx?id=21)。
+
+
+安装完成后，会在桌面生成编辑器的快捷方式，如下图所示：
 
 ![]({{site.url}}{{site.baseurl}}/img/tutorials/tutorial1/designerIcon.png)
 
