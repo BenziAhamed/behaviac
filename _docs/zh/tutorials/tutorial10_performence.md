@@ -37,3 +37,13 @@ lang: zh
 	- 如果想选择打开或关闭调试功能而不是完全的关闭，则不需要修改任何关于`BEHAVIAC_RELEASE`的定义，通过behaviac::Config::SetLogging和behaviac::Config::SetSocketing来控制是否打开logging和socketing。
  3. 不使用xml或bson格式，而是使用C++或C#格式
  	- C#下，还需要那些在行为树中使用到的Agent的成员都是public的（非public的成员即使通过C#代码访问也需要使用反射系统来进行，会导致GC Alloc以及性能损失）。
+
+
+<div class="note info">
+  <h5>overhead</h5>
+</div>
+behaviac可以导出xml(bson)，或者源码（cpp/c#），源码的效率要优于数据（xml/bson）的执行效率。实际上这里的效率都是指的behaviac本身的overhead，如果提供的`方法`本身效率很低，运行很慢，behaviac本身的overhead就可以忽略不计了，无论是选用导出何种格式都遇事无补，这个时候，最需要解决的是优化方法的执行效率。
+
+![overhead]({{site.url}}{{site.baseurl}}/img/references/overhead.png)
+如上图，尽管xml格式是cpp格式的大约2倍，但这个overhead实际上是非常小的，只有0.0000269秒，0.0269毫秒。（具体数据会因为测试环境的不同有差异）。
+
