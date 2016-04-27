@@ -42,6 +42,7 @@ lang: zh
         1. Default，缺省模式是Debug下`BEHAVIAC_RELEASE`没有定义，而Release下`BEHAVIAC_RELEASE`有定义
         1. ForceUseDev，强制不定义BEHAVIAC_RELEASE
         1. ForceUseRelease，强制定义BEHAVIAC_RELEASE
+          * 在ForceUseRelease的时候，Release下，生成的项目文件会试图打开LTO开关，请参考[Cpp生成代码大小的说明]({{site.url}}{{site.baseurl}}/docs/zh/articles/code_size)
     - `CMAKE_BUILD_TYPE`用来控制生成Debug还是Release（visual studio的时候不需要指定CMAKE_BUILD_TYPE）
     - `BUILD_SHARED_LIBS`用来控制libbehaviac是stati lib/a还是dynamid dll/so
     - `BUILD_USE_64BITS`用来控制是否生成64位 （visual studio的时候需要指定带Win64的generator，请参考Cmake的文档）

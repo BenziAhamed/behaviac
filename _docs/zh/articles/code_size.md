@@ -16,6 +16,7 @@ Cpp版本广泛的用到了template。
 
 在3.4.0后的版本里，behaviac已经支持了Link Time Optimization（LTO）。LTO可以极大的减少产生代码的大小以及优化产生代码的效率。
 
+
 ### gcc
 
  - 如下所示，通过参数指定`Release`以及`ForeUseRelease`可以打开LTO（如果你的gcc支持的话）
@@ -26,7 +27,8 @@ Cpp版本广泛的用到了template。
 
 ### msvc
 
- - 在visual studio中可以参考打开编译选项/Gy及/OPT:ICF /OPT:REF /LTCG链接选项
+ - 在visual studio中可以参考打开编译选项/Gy, /GL及/OPT:ICF /OPT:REF /LTCG链接选项
  - 指定`ForeUseRelease`的时候，cmake生成的项目文件，在Release下缺省的已经打开上述优化开关。
  - 也可以考虑调整O1,O2或Ox编译选项
 
+请参考[构建说明]({{site.url}}{{site.baseurl}}/docs/zh/articles/build)
