@@ -22,7 +22,14 @@ lang: zh
 
 ![attachment]({{site.url}}{{site.baseurl}}/img/references/preaction_prop.png)
 
-其中，“联合”是用于同一个节点的多个前置是“与（&&）”还是“或（||）”的运算关系，执行时的逻辑顺序是从上往下依次执行，不管“与”还是“或”。
+其中，“联合”是用于同一个节点的多个前置是“与（and）”还是“或（or）”的运算关系，执行时的逻辑顺序是从上往下依次执行，不管“与”还是“或”。如果“联合”是and
+ - 如果有a，b两个前置，则最后的结果是（a and b）。
+ - 如果有a，b，c三个前置，则最后的结果是（a and b and c），也即：（（a and b） and c）。如果a是false，b和c还是会计算，没有shortcut的优化。
+
+如果“联合”是or
+ - 如果有a，b两个前置，则最后的结果是（a or b）。
+ - 如果有a，b，c三个前置，则最后的结果是（a or b or c），也即：（（a or b） or c）。如果a是true，b和c还是会计算，没有shortcut的优化。
+
 
 “执行时机”分为Enter、Update和Both三种类型：
 
