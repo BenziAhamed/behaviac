@@ -77,6 +77,8 @@ testAgent.FireEvent(“event_test_int_bool”, 15, true);
 
 这样，在执行行为树event_ut_1时，如果接收到事件“event_test_int_bool”，那么行为树中的事件附件将得到响应和处理，行为树的执行就会从当前的event_ut_1跳转到event_subtree_2。
 
+调用FireEvent的时候，只有处于running状态的节点才响应事件。这样子是是为了事件的灵活性的考虑。如果不需要依赖节点是否处于running状态，只是需要响应事件，可以把事件配置在根节点上。
+
 另外需要补充说明的是，行为树event_subtree_2带有任务节点，我们也可以直接将该行为树拖拽到行为树event_ut_1中，如图3.5所示。
 
 ![]({{site.url}}{{site.baseurl}}/img/overview/eventsubtree.png)
