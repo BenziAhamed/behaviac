@@ -842,11 +842,11 @@ namespace Behaviac.Design
                             {
                                 UndoManager.Save(behavior);
                             }
-
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.Message, Resources.LoadError, MessageBoxButtons.OK);
+                            string errorInfo = string.Format("{0}\n{1}", filename, ex.Message);
+                            MessageBox.Show(errorInfo, Resources.LoadError, MessageBoxButtons.OK);
                         }
 
                         break;
@@ -2913,8 +2913,7 @@ namespace Behaviac.Design
                 {
                     try
                     {
-                        SaveBehavior(node, false);
-
+                        SaveBehavior(node, false, false);
                     }
                     catch (Exception ex)
                     {
@@ -2930,8 +2929,7 @@ namespace Behaviac.Design
                 {
                     try
                     {
-                        SaveBehavior(node, false);
-
+                        SaveBehavior(node, false, false);
                     }
                     catch (Exception ex)
                     {

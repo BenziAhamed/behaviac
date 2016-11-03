@@ -77,11 +77,9 @@
     <ClCompile Include="..\..\..\..\src\base\file\textfile.cpp" />
     <ClCompile Include="..\..\..\..\src\base\logging\logmanager.cpp" />
     <ClCompile Include="..\..\..\..\src\base\md5.cpp" />
-    <ClCompile Include="..\..\..\..\src\base\meta.cpp" />
     <ClCompile Include="..\..\..\..\src\base\object\methodbase.cpp" />
     <ClCompile Include="..\..\..\..\src\base\object\tagobject.cpp" />
     <ClCompile Include="..\..\..\..\src\base\object\tagobjecttemplatemanager.cpp" />
-    <ClCompile Include="..\..\..\..\src\base\operation.cpp" />
     <ClCompile Include="..\..\..\..\src\base\randomgenerator\randomgenerator.cpp" />
     <ClCompile Include="..\..\..\..\src\base\serialization\textnode.cpp" />
     <ClCompile Include="..\..\..\..\src\base\socket\socketconnect.cpp" />
@@ -110,6 +108,7 @@
     <ClCompile Include="..\..\..\..\src\behaviortree\nodes\composites\compositestochastic.cpp" />
     <ClCompile Include="..\..\..\..\src\behaviortree\nodes\composites\ifelse.cpp" />
     <ClCompile Include="..\..\..\..\src\behaviortree\nodes\composites\parallel.cpp" />
+    <ClCompile Include="..\..\..\..\src\behaviortree\nodes\composites\query.cpp" />
     <ClCompile Include="..\..\..\..\src\behaviortree\nodes\composites\referencebehavior.cpp" />
     <ClCompile Include="..\..\..\..\src\behaviortree\nodes\composites\selector.cpp" />
     <ClCompile Include="..\..\..\..\src\behaviortree\nodes\composites\selectorloop.cpp" />
@@ -164,7 +163,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\inc\behaviac\agent\agent.h" />
-    <ClInclude Include="..\..\..\..\inc\behaviac\agent\agentstate.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\agent\checkresult.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\agent\context.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\agent\registermacros.h" />
@@ -235,10 +233,7 @@
     <ClInclude Include="..\..\..\..\inc\behaviac\base\functions.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\base\logging\logmanager.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\base\md5.h" />
-    <ClInclude Include="..\..\..\..\inc\behaviac\base\member.h" />
-    <ClInclude Include="..\..\..\..\inc\behaviac\base\meta.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\base\meta\addpointer.h" />
-    <ClInclude Include="..\..\..\..\inc\behaviac\base\meta\consttype.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\base\meta\count.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\base\meta\count.hpp" />
     <ClInclude Include="..\..\..\..\inc\behaviac\base\meta\exist.h" />
@@ -303,7 +298,6 @@
     <ClInclude Include="..\..\..\..\inc\behaviac\base\object\typehandlerex.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\base\object\uitype.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\base\object\uitypeinterface.h" />
-    <ClInclude Include="..\..\..\..\inc\behaviac\base\operation.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\base\randomgenerator\randomgenerator.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\base\serialization\serializablenode.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\base\serialization\textnode.h" />
@@ -344,6 +338,7 @@
     <ClInclude Include="..\..\..\..\inc\behaviac\behaviortree\nodes\composites\compositestochastic.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\behaviortree\nodes\composites\ifelse.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\behaviortree\nodes\composites\parallel.h" />
+    <ClInclude Include="..\..\..\..\inc\behaviac\behaviortree\nodes\composites\query.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\behaviortree\nodes\composites\referencebehavior.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\behaviortree\nodes\composites\selector.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\behaviortree\nodes\composites\selectorloop.h" />
@@ -383,6 +378,8 @@
     <ClInclude Include="..\..\..\..\inc\behaviac\fsm\waitframesstate.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\fsm\waitstate.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\fsm\waittransition.h" />
+    <ClInclude Include="..\..\..\..\inc\behaviac\htn\agentproperties.h" />
+    <ClInclude Include="..\..\..\..\inc\behaviac\htn\agentstate.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\htn\method.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\htn\planner.h" />
     <ClInclude Include="..\..\..\..\inc\behaviac\htn\plannertask.h" />

@@ -22,7 +22,7 @@ namespace PluginBehaviac.DataExporters
 {
     public class StructCppExporter
     {
-        public static void GenerateCode(object obj, StreamWriter stream, string indent, string var, object parent, string paramName)
+        public static void GenerateCode(object obj, DefaultObject defaultObj, StreamWriter stream, string indent, string var, object parent, string paramName)
         {
             Debug.Check(obj != null);
 
@@ -47,13 +47,13 @@ namespace PluginBehaviac.DataExporters
                         int endIndex = nativeTypeStr.LastIndexOf('>');
                         string itemType = nativeTypeStr.Substring(startIndex + 1, endIndex - startIndex - 1);
 
-                        ArrayCppExporter.GenerateCode(member, stream, indent, itemType, var + "." + property.Property.Name);
+                        ArrayCppExporter.GenerateCode(member, defaultObj, stream, indent, itemType, var + "." + property.Property.Name);
                     }
                     else
                     {
                         if (property.Attribute is DesignerStruct)
                         {
-                            GenerateCode(member, stream, indent, var + "." + property.Property.Name, parent, paramName);
+                            GenerateCode(member, defaultObj, stream, indent, var + "." + property.Property.Name, parent, paramName);
                         }
                         else
                         {
@@ -64,13 +64,13 @@ namespace PluginBehaviac.DataExporters
                                 if (param != null)
                                 {
                                     bStructProperty = true;
-                                    ParameterCppExporter.GenerateCode(param, stream, indent, string.Empty, var + "." + property.Property.Name, string.Empty);
+                                    ParameterCppExporter.GenerateCode(defaultObj, param, stream, indent, string.Empty, var + "." + property.Property.Name, string.Empty);
                                 }
                             }
 
                             if (!bStructProperty)
                             {
-                                DataCppExporter.GenerateCode(member, stream, indent, string.Empty, var + "." + property.Property.Name, string.Empty);
+                                DataCppExporter.GenerateCode(member, defaultObj, stream, indent, string.Empty, var + "." + property.Property.Name, string.Empty);
                             }
                         }
                     }

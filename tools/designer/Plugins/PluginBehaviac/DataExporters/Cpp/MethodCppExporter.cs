@@ -22,7 +22,7 @@ namespace PluginBehaviac.DataExporters
 {
     public class MethodCppExporter
     {
-        public static void GenerateClassConstructor(Behaviac.Design.MethodDef method, StreamWriter stream, string indent, string var)
+        public static void GenerateClassConstructor(DefaultObject defaultObj, Behaviac.Design.MethodDef method, StreamWriter stream, string indent, string var)
         {
             for (int i = 0; i < method.Params.Count; ++i)
             {
@@ -41,7 +41,7 @@ namespace PluginBehaviac.DataExporters
                             int endIndex = nativeType.LastIndexOf('>');
                             string itemType = nativeType.Substring(startIndex + 1, endIndex - startIndex - 1);
 
-                            ArrayCppExporter.GenerateCode(obj, stream, indent + "\t\t\t", itemType, param);
+                            ArrayCppExporter.GenerateCode(obj, defaultObj, stream, indent + "\t\t\t", itemType, param);
                         }
                         else if (Plugin.IsCustomClassType(type))
                         {
@@ -51,13 +51,13 @@ namespace PluginBehaviac.DataExporters
                             }
                             else if (DesignerStruct.IsPureConstDatum(obj, method, method.Params[i].Name))
                             {
-                                StructCppExporter.GenerateCode(obj, stream, indent + "\t\t\t", param, null, "");
+                                StructCppExporter.GenerateCode(obj, defaultObj, stream, indent + "\t\t\t", param, null, "");
                             }
                         }
                         else
                         {
                             string nativeType = DataCppExporter.GetBasicGeneratedNativeType(method.Params[i].NativeType);
-                            string retStr = DataCppExporter.GenerateCode(obj, stream, string.Empty, nativeType, string.Empty, string.Empty);
+                            string retStr = DataCppExporter.GenerateCode(obj, defaultObj, stream, string.Empty, nativeType, string.Empty, string.Empty);
                             stream.WriteLine("{0}\t\t\t{1} = {2};", indent, param, retStr);
                         }
                     }
@@ -80,7 +80,7 @@ namespace PluginBehaviac.DataExporters
             }
         }
 
-        public static string GenerateCode(Behaviac.Design.MethodDef method, StreamWriter stream, string indent, string typename, string var, string caller)
+        public static string GenerateCode(DefaultObject defaultObj, Behaviac.Design.MethodDef method, StreamWriter stream, string indent, string typename, string var, string caller)
         {
             string allParamTypes = string.Empty;
             string allParams = string.Empty;
@@ -101,10 +101,10 @@ namespace PluginBehaviac.DataExporters
                         PropertyDef prop = method.Params[i].Property;
                         if (prop != null && prop.IsArrayElement)
                         {
-                            string property = PropertyCppExporter.GetProperty(prop, v.ArrayIndexElement, stream, indent, param, caller);
+                            string property = PropertyCppExporter.GetProperty(defaultObj, prop, v.ArrayIndexElement, stream, indent, param, caller);
                             string propName = prop.BasicName.Replace("[]", "");
 
-                            ParameterCppExporter.GenerateCode(v.ArrayIndexElement, stream, indent, "int", param + "_index", param + caller);
+                            ParameterCppExporter.GenerateCode(defaultObj, v.ArrayIndexElement, stream, indent, "int", param + "_index", param + caller);
                             param = string.Format("({0})[{1}_index]", property, param);
                         }
                     }
@@ -112,17 +112,17 @@ namespace PluginBehaviac.DataExporters
                     {
                         if ((method.Params[i].Property != null && method.Params[i].Property.IsCustomized) || method.Params[i].IsLocalVar)
                         {
-                            ParameterCppExporter.GenerateCode(method.Params[i], stream, indent, basicNativeType, param, caller);
+                            ParameterCppExporter.GenerateCode(defaultObj, method.Params[i], stream, indent, basicNativeType, param, caller);
                         }
                         else
                         {
                             if (method.IsPublic)
                             {
-                                param = ParameterCppExporter.GenerateCode(method.Params[i], stream, indent, basicNativeType, "", param);
+                                param = ParameterCppExporter.GenerateCode(defaultObj, method.Params[i], stream, indent, basicNativeType, "", param);
                             }
                             else
                             {
-                                ParameterCppExporter.GenerateCode(method.Params[i], stream, indent, basicNativeType, param, caller);
+                                ParameterCppExporter.GenerateCode(defaultObj, method.Params[i], stream, indent, basicNativeType, param, caller);
                             }
                         }
                     }
@@ -146,7 +146,7 @@ namespace PluginBehaviac.DataExporters
                         //else 
                         if (Plugin.IsCustomClassType(type) && !DesignerStruct.IsPureConstDatum(obj, method, method.Params[i].Name))
                         {
-                            StructCppExporter.GenerateCode(obj, stream, indent, param, method, method.Params[i].Name);
+                            StructCppExporter.GenerateCode(obj, defaultObj, stream, indent, param, method, method.Params[i].Name);
                         }
                     }
                 }
@@ -167,7 +167,27 @@ namespace PluginBehaviac.DataExporters
             {
                 agentName = "pAgent_" + caller;
 
-                stream.WriteLine("{0}Agent* {1} = Agent::GetInstance(pAgent, \"{2}\");", indent, agentName, method.Owner);
+                bool isGlobal = Plugin.IsInstanceName(method.Owner, null);
+                PropertyDef ownerProperty = null;
+
+                if (!isGlobal)
+                {
+                    Debug.Check(defaultObj != null && defaultObj.Behavior != null && defaultObj.Behavior.AgentType != null);
+                    ownerProperty = defaultObj.Behavior.AgentType.GetPropertyByName(method.Owner);
+                }
+
+                if (isGlobal || ownerProperty == null || ownerProperty.IsCustomized) // global or customized instance
+                {
+                    stream.WriteLine("{0}Agent* {1} = Agent::GetInstance(pAgent, \"{2}\");", indent, agentName, method.Owner);
+                }
+                else // member instance
+                {
+                    string propName = ownerProperty.Name.Replace("::", "_");
+                    string nativeType = DataCppExporter.GetGeneratedNativeType(ownerProperty.NativeType);
+                    string prop = string.Format("(({0}*)pAgent)->_Get_Property_<{1}PROPERTY_TYPE_{2}, {3} >()", ownerProperty.ClassName, getNamespace(ownerProperty.ClassName), propName, nativeType);
+
+                    stream.WriteLine("{0}Agent* {1} = {2};", indent, agentName, prop);
+                }
                 stream.WriteLine("{0}BEHAVIAC_ASSERT({1});", indent, agentName);
             }
 

@@ -40,12 +40,12 @@ namespace PluginBehaviac.NodeExporters
 
             if (compute.Opr1 != null)
             {
-                RightValueCsExporter.GenerateClassConstructor(compute.Opr1, stream, indent, "opr1");
+                RightValueCsExporter.GenerateClassConstructor(node, compute.Opr1, stream, indent, "opr1");
             }
 
             if (compute.Opr2 != null)
             {
-                RightValueCsExporter.GenerateClassConstructor(compute.Opr2, stream, indent, "opr2");
+                RightValueCsExporter.GenerateClassConstructor(node, compute.Opr2, stream, indent, "opr2");
             }
         }
 
@@ -85,8 +85,8 @@ namespace PluginBehaviac.NodeExporters
                 string typeName = Plugin.GetNativeTypeName(compute.Opr1.ValueType);
                 typeName = typeName.Replace("::", ".");
 
-                RightValueCsExporter.GenerateCode(compute.Opr1, stream, indent + "\t\t\t", typeName, "opr1", "opr1");
-                RightValueCsExporter.GenerateCode(compute.Opr2, stream, indent + "\t\t\t", typeName, "opr2", "opr2");
+                RightValueCsExporter.GenerateCode(node, compute.Opr1, stream, indent + "\t\t\t", typeName, "opr1", "opr1");
+                RightValueCsExporter.GenerateCode(node, compute.Opr2, stream, indent + "\t\t\t", typeName, "opr2", "opr2");
 
                 string oprStr = string.Empty;
                 switch (compute.Operator)
@@ -117,12 +117,12 @@ namespace PluginBehaviac.NodeExporters
                 PropertyDef prop = compute.Opl.Property;
                 if (prop != null)
                 {
-                    string property = PropertyCsExporter.GetProperty(prop, compute.Opl.ArrayIndexElement, stream, indent + "\t\t\t", "opl", "compute");
+                    string property = PropertyCsExporter.GetProperty(node, prop, compute.Opl.ArrayIndexElement, stream, indent + "\t\t\t", "opl", "compute");
                     string propName = prop.BasicName.Replace("[]", "");
 
                     if (prop.IsArrayElement && compute.Opl.ArrayIndexElement != null)
                     {
-                        ParameterCsExporter.GenerateCode(compute.Opl.ArrayIndexElement, stream, indent + "\t\t\t", "int", "opl_index", "compute_opl");
+                        ParameterCsExporter.GenerateCode(node, compute.Opl.ArrayIndexElement, stream, indent + "\t\t\t", "int", "opl_index", "compute_opl");
                         property = string.Format("({0})[opl_index]", property);
                     }
 

@@ -21,12 +21,12 @@ namespace PluginBehaviac.DataExporters
 {
     public class PropertyCppExporter
     {
-        public static string GenerateCode(Behaviac.Design.PropertyDef property, MethodDef.Param arrayIndexElement, bool isRefParam, StreamWriter stream, string indent, string typename, string var, string caller)
+        public static string GenerateCode(DefaultObject defaultObj, Behaviac.Design.PropertyDef property, MethodDef.Param arrayIndexElement, bool isRefParam, StreamWriter stream, string indent, string typename, string var, string caller)
         {
             if (property.IsPar || property.IsCustomized)
                 return ParInfoCppExporter.GenerateCode(property, isRefParam, stream, indent, typename, var, caller);
 
-            string prop = GetProperty(property, arrayIndexElement, stream, indent, var, caller);
+            string prop = GetProperty(defaultObj, property, arrayIndexElement, stream, indent, var, caller);
 
             if (!string.IsNullOrEmpty(var))
             {
@@ -124,19 +124,37 @@ namespace PluginBehaviac.DataExporters
             return string.Format("(({0}*){1})->_Get_Property_<{2}PROPERTY_TYPE_{3}, {4} >()", property.ClassName, agentName, getNamespace(property.ClassName), propName, nativeType);
         }
 
-        public static string GetProperty(Behaviac.Design.PropertyDef property, MethodDef.Param arrayIndexElement, StreamWriter stream, string indent, string var, string caller)
+        public static string GetProperty(DefaultObject defaultObj, Behaviac.Design.PropertyDef property, MethodDef.Param arrayIndexElement, StreamWriter stream, string indent, string var, string caller)
         {
             string agentName = GetGenerateAgentName(property, var, caller);
 
             if (property.Owner != Behaviac.Design.VariableDef.kSelf)
             {
-                stream.WriteLine("{0}Agent* {1} = Agent::GetInstance(pAgent, \"{2}\");", indent, agentName, property.Owner);
+                bool isGlobal = Plugin.IsInstanceName(property.Owner, null);
+                PropertyDef ownerProperty = null;
+
+                if (!isGlobal)
+                {
+                    Debug.Check(defaultObj != null && defaultObj.Behavior != null && defaultObj.Behavior.AgentType != null);
+                    ownerProperty = defaultObj.Behavior.AgentType.GetPropertyByName(property.Owner);
+                }
+
+                if (isGlobal || ownerProperty == null || ownerProperty.IsCustomized) // global or customized instance
+                {
+                    stream.WriteLine("{0}Agent* {1} = Agent::GetInstance(pAgent, \"{2}\");", indent, agentName, property.Owner);
+                }
+                else // member instance
+                {
+                    string propName = ownerProperty.Name.Replace("::", "_");
+                    string nativeType = DataCppExporter.GetGeneratedNativeType(ownerProperty.NativeType);
+                    string prop = string.Format("(({0}*)pAgent)->_Get_Property_<{1}PROPERTY_TYPE_{2}, {3} >()", ownerProperty.ClassName, getNamespace(ownerProperty.ClassName), propName, nativeType);
+
+                    stream.WriteLine("{0}Agent* {1} = {2};", indent, agentName, prop);
+                }
                 stream.WriteLine("{0}BEHAVIAC_ASSERT({1});", indent, agentName);
             }
 
-            string prop = getProperty(property, arrayIndexElement, agentName, stream, indent);
-
-            return prop;
+            return getProperty(property, arrayIndexElement, agentName, stream, indent);
         }
     }
 }

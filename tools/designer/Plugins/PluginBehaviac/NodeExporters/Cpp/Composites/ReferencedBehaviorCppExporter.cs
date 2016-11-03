@@ -55,7 +55,7 @@ namespace PluginBehaviac.NodeExporters
             stream.WriteLine("{0}\t\t{{", indent);
             stream.WriteLine("{0}\t\t\tBEHAVIAC_UNUSED_VAR(pAgent);", indent);
 
-            string retStr = RightValueCppExporter.GenerateCode(referencedBehavior.ReferenceBehavior, stream, indent + "\t\t\t", "const char*", string.Empty, "_referencedBehavior");
+            string retStr = RightValueCppExporter.GenerateCode(node, referencedBehavior.ReferenceBehavior, stream, indent + "\t\t\t", "const char*", string.Empty, "_referencedBehavior");
 
             bool bConst = false;
             if (referencedBehavior.ReferenceBehavior.Var != null && referencedBehavior.ReferenceBehavior.Var.IsConst)

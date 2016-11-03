@@ -33,7 +33,7 @@ namespace behaviac
         const char*		GetEventName();
         bool			TriggeredOnce();
         TriggerMode		GetTriggerMode();
-        void			switchTo(Agent* pAgent);
+		bool			switchTo(Agent* pAgent, bool bStateStackPushed);
     protected:
         virtual bool IsValid(Agent* pAgent, BehaviorTask* pTask) const;
 

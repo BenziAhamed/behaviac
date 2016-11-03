@@ -22,7 +22,7 @@ namespace PluginBehaviac.DataExporters
 {
     public class MethodCsExporter
     {
-        public static void GenerateClassConstructor(Behaviac.Design.MethodDef method, StreamWriter stream, string indent, string var)
+        public static void GenerateClassConstructor(DefaultObject defaultObj, MethodDef method, StreamWriter stream, string indent, string var)
         {
             Debug.Check(!string.IsNullOrEmpty(var));
 
@@ -58,7 +58,7 @@ namespace PluginBehaviac.DataExporters
                             int endIndex = typename.LastIndexOf('>');
                             string itemType = typename.Substring(startIndex + 1, endIndex - startIndex - 1);
 
-                            ArrayCsExporter.GenerateCode(obj, stream, indent + "\t\t\t", itemType, param);
+                            ArrayCsExporter.GenerateCode(obj, defaultObj, stream, indent + "\t\t\t", itemType, param);
                             if (!method.IsPublic)
                             {
                                 stream.WriteLine("{0}\t\t\t{1} = {2};", indent, paramName, param);
@@ -74,7 +74,7 @@ namespace PluginBehaviac.DataExporters
                                 }
 
                                 string paramType = DataCsExporter.GetGeneratedNativeType(method.Params[i].NativeType);
-                                StructCsExporter.GenerateCode(obj, stream, indent + "\t\t\t", param, paramType, null, "");
+                                StructCsExporter.GenerateCode(obj, defaultObj, stream, indent + "\t\t\t", param, paramType, null, "");
 
                                 if (!method.IsPublic)
                                 {
@@ -84,7 +84,7 @@ namespace PluginBehaviac.DataExporters
                         }
                         else
                         {
-                            string retStr = DataCsExporter.GenerateCode(obj, stream, string.Empty, method.Params[i].NativeType, string.Empty, string.Empty);
+                            string retStr = DataCsExporter.GenerateCode(obj, defaultObj, stream, string.Empty, method.Params[i].NativeType, string.Empty, string.Empty);
                             if (!method.IsPublic)
                             {
                                 param = paramName;
@@ -122,7 +122,7 @@ namespace PluginBehaviac.DataExporters
             }
         }
 
-        public static string GenerateCode(Behaviac.Design.MethodDef method, StreamWriter stream, string indent, string typename, string var, string caller)
+        public static string GenerateCode(DefaultObject defaultObj, Behaviac.Design.MethodDef method, StreamWriter stream, string indent, string typename, string var, string caller)
         {
             Debug.Check(!string.IsNullOrEmpty(var) || !string.IsNullOrEmpty(caller));
 
@@ -146,17 +146,17 @@ namespace PluginBehaviac.DataExporters
                 {
                     if ((method.Params[i].Property != null && method.Params[i].Property.IsCustomized) || method.Params[i].IsLocalVar)
                     {
-                        ParameterCsExporter.GenerateCode(method.Params[i], stream, indent, method.IsPublic ? nativeType : "", param, caller);
+                        ParameterCsExporter.GenerateCode(defaultObj, method.Params[i], stream, indent, method.IsPublic ? nativeType : "", param, caller);
                     }
                     else
                     {
                         if (method.IsPublic)
                         {
-                            param = ParameterCsExporter.GenerateCode(method.Params[i], stream, indent, nativeType, "", param);
+                            param = ParameterCsExporter.GenerateCode(defaultObj, method.Params[i], stream, indent, nativeType, "", param);
                         }
                         else
                         {
-                            ParameterCsExporter.GenerateCode(method.Params[i], stream, indent, "", param, caller);
+                            ParameterCsExporter.GenerateCode(defaultObj, method.Params[i], stream, indent, "", param, caller);
                         }
                     }
 
@@ -166,11 +166,11 @@ namespace PluginBehaviac.DataExporters
                         PropertyDef prop = method.Params[i].Property;
                         if (prop != null && prop.IsArrayElement)
                         {
-                            ParameterCsExporter.GenerateCode(v.ArrayIndexElement, stream, indent, "int", param + "_index", param + caller);
+                            ParameterCsExporter.GenerateCode(defaultObj, v.ArrayIndexElement, stream, indent, "int", param + "_index", param + caller);
 
                             if (string.IsNullOrEmpty(param))
                             {
-                                string property = PropertyCsExporter.GetProperty(prop, v.ArrayIndexElement, stream, indent, param, caller);
+                                string property = PropertyCsExporter.GetProperty(defaultObj, prop, v.ArrayIndexElement, stream, indent, param, caller);
                                 param = string.Format("({0})[{1}_index]", property, param);
                             }
                             else
@@ -191,7 +191,7 @@ namespace PluginBehaviac.DataExporters
                             string paramName = getParamName(var, caller, i);
                             string paramType = DataCsExporter.GetGeneratedNativeType(method.Params[i].NativeType);
 
-                            StructCsExporter.GenerateCode(obj, stream, indent, paramName, paramType, method, method.Params[i].Name);
+                            StructCsExporter.GenerateCode(obj, defaultObj, stream, indent, paramName, paramType, method, method.Params[i].Name);
                             if (!method.IsPublic)
                             {
                                 stream.WriteLine("{0}{1} = {2};", indent, param, paramName);
@@ -216,13 +216,49 @@ namespace PluginBehaviac.DataExporters
             }
 
             string agentName = "pAgent";
-            if (method.Owner != Behaviac.Design.VariableDef.kSelf &&
-                (!method.IsPublic || !method.IsStatic))
+            if (method.Owner != Behaviac.Design.VariableDef.kSelf && (!method.IsPublic || !method.IsStatic))
             {
                 string instanceName = method.Owner.Replace("::", ".");
                 agentName = "pAgent_" + caller;
 
-                stream.WriteLine("{0}behaviac.Agent {1} = behaviac.Utils.GetParentAgent(pAgent, \"{2}\");", indent, agentName, instanceName);
+                bool isGlobal = Plugin.IsInstanceName(instanceName, null);
+                PropertyDef ownerProperty = null;
+
+                if (!isGlobal)
+                {
+                    Debug.Check(defaultObj != null && defaultObj.Behavior != null && defaultObj.Behavior.AgentType != null);
+                    ownerProperty = defaultObj.Behavior.AgentType.GetPropertyByName(instanceName);
+                }
+
+                if (isGlobal || ownerProperty == null || ownerProperty.IsCustomized) // global or customized instance
+                {
+                    stream.WriteLine("{0}behaviac.Agent {1} = behaviac.Utils.GetParentAgent(pAgent, \"{2}\");", indent, agentName, instanceName);
+                }
+                else // member instance
+                {
+                    string prop = "";
+
+                    if (ownerProperty.IsPublic)
+                    {
+                        string className = ownerProperty.ClassName.Replace("::", ".");
+
+                        if (ownerProperty.IsStatic)
+                        {
+                            prop = string.Format("{0}.{1}", className, instanceName);
+                        }
+                        else
+                        {
+                            prop = string.Format("(({0})pAgent).{1}", className, instanceName);
+                        }
+                    }
+                    else
+                    {
+                        string nativeType = DataCsExporter.GetGeneratedNativeType(ownerProperty.NativeType);
+                        prop = string.Format("({0})AgentMetaVisitor.GetProperty(pAgent, \"{1}\")", nativeType, instanceName);
+                    }
+
+                    stream.WriteLine("{0}behaviac.Agent {1} = {2};", indent, agentName, prop);
+                }
                 stream.WriteLine("{0}Debug.Check({1} != null || Utils.IsStaticClass(\"{2}\"));", indent, agentName, instanceName);
             }
 

@@ -100,13 +100,17 @@ namespace behaviac
         return m_className;
     }
 
-    void CNamedEvent::SetFired(Agent* pAgent, bool bFired)
+    bool CNamedEvent::SetFired(Agent* pAgent, bool bFired, int paramsCount)
     {
         this->m_bFired = bFired;
 
         if (bFired)
         {
-            pAgent->btonevent(this->GetName());
+			bool bStateStackPushed = paramsCount > 0;
+			bool bFired = pAgent->btonevent(this->GetName(), bStateStackPushed);
+			return bFired;
         }
+
+		return false;
     }
 }

@@ -40,7 +40,7 @@ namespace PluginBehaviac.NodeExporters
 
             if (decoratorFrames.Frames != null)
             {
-                RightValueCsExporter.GenerateClassConstructor(decoratorFrames.Frames, stream, indent, "Frames");
+                RightValueCsExporter.GenerateClassConstructor(node, decoratorFrames.Frames, stream, indent, "Frames");
             }
         }
 
@@ -71,7 +71,7 @@ namespace PluginBehaviac.NodeExporters
                 stream.WriteLine("{0}\t\tprotected override int GetFrames(Agent pAgent)", indent);
                 stream.WriteLine("{0}\t\t{{", indent);
 
-                string retStr = RightValueCsExporter.GenerateCode(decoratorFrames.Frames, stream, indent + "\t\t\t", string.Empty, string.Empty, "Frames");
+                string retStr = RightValueCsExporter.GenerateCode(node, decoratorFrames.Frames, stream, indent + "\t\t\t", string.Empty, string.Empty, "Frames");
 
                 if (!decoratorFrames.Frames.IsPublic && (decoratorFrames.Frames.IsMethod || decoratorFrames.Frames.Var != null && decoratorFrames.Frames.Var.IsProperty))
                 {

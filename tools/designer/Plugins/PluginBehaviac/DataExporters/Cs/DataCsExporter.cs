@@ -157,7 +157,7 @@ namespace PluginBehaviac.DataExporters
         /// <param name="var">The variable for the given object when generating the codes.</param>
         /// <param name="caller">The caller for the method or the agent.</param>
         /// <returns>Returns the string generated value.</returns>
-        public static string GenerateCode(object obj, StreamWriter stream, string indent, string typename, string var, string caller, string setValue = null)
+        public static string GenerateCode(object obj, DefaultObject defaultObj, StreamWriter stream, string indent, string typename, string var, string caller, string setValue = null)
         {
             string retStr = string.Empty;
 
@@ -168,12 +168,12 @@ namespace PluginBehaviac.DataExporters
                 if (obj is Behaviac.Design.MethodDef)
                 {
                     Behaviac.Design.MethodDef method = obj as Behaviac.Design.MethodDef;
-                    retStr = MethodCsExporter.GenerateCode(method, stream, indent, typename, var, caller);
+                    retStr = MethodCsExporter.GenerateCode(defaultObj, method, stream, indent, typename, var, caller);
                 }
                 else if (obj is Behaviac.Design.MethodDef.Param)
                 {
                     Behaviac.Design.MethodDef.Param param = obj as Behaviac.Design.MethodDef.Param;
-                    retStr = ParameterCsExporter.GenerateCode(param, stream, indent, typename, var, caller);
+                    retStr = ParameterCsExporter.GenerateCode(defaultObj, param, stream, indent, typename, var, caller);
                 }
                 else if (obj is Behaviac.Design.ParInfo)
                 {
@@ -183,17 +183,17 @@ namespace PluginBehaviac.DataExporters
                 else if (obj is Behaviac.Design.PropertyDef)
                 {
                     Behaviac.Design.PropertyDef property = obj as Behaviac.Design.PropertyDef;
-                    retStr = PropertyCsExporter.GenerateCode(property, null, false, stream, indent, typename, var, caller, setValue);
+                    retStr = PropertyCsExporter.GenerateCode(defaultObj, property, null, false, stream, indent, typename, var, caller, setValue);
                 }
                 else if (obj is Behaviac.Design.VariableDef)
                 {
                     Behaviac.Design.VariableDef variable = obj as Behaviac.Design.VariableDef;
-                    retStr = VariableCsExporter.GenerateCode(variable, false, stream, indent, typename, var, caller);
+                    retStr = VariableCsExporter.GenerateCode(defaultObj, variable, false, stream, indent, typename, var, caller);
                 }
                 else if (obj is Behaviac.Design.RightValueDef)
                 {
                     Behaviac.Design.RightValueDef rightValue = obj as Behaviac.Design.RightValueDef;
-                    retStr = RightValueCsExporter.GenerateCode(rightValue, stream, indent, typename, var, caller);
+                    retStr = RightValueCsExporter.GenerateCode(defaultObj, rightValue, stream, indent, typename, var, caller);
                 }
                 // Array type
                 else if (Plugin.IsArrayType(type))
@@ -213,7 +213,7 @@ namespace PluginBehaviac.DataExporters
                     int endIndex = typename.LastIndexOf('>');
                     string itemType = typename.Substring(startIndex + 1, endIndex - startIndex - 1);
 
-                    ArrayCsExporter.GenerateCode(obj, stream, indent, itemType, var);
+                    ArrayCsExporter.GenerateCode(obj, defaultObj, stream, indent, itemType, var);
                 }
                 // Struct type
                 else if (Plugin.IsCustomClassType(type))
@@ -225,7 +225,7 @@ namespace PluginBehaviac.DataExporters
                         stream.WriteLine("{0}{1} {2};", indent, typename, var);
                     }
 
-                    StructCsExporter.GenerateCode(obj, stream, indent, var, typename, null, "");
+                    StructCsExporter.GenerateCode(obj, defaultObj, stream, indent, var, typename, null, "");
                 }
                 // Other types
                 else

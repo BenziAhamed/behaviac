@@ -42,12 +42,12 @@ namespace PluginBehaviac.NodeExporters
 
             if (transition.Opl != null)
             {
-                RightValueCppExporter.GenerateClassConstructor(transition.Opl, stream, indent, "opl");
+                RightValueCppExporter.GenerateClassConstructor(attachment, transition.Opl, stream, indent, "opl");
             }
 
             if (transition.Opr2 != null)
             {
-                RightValueCppExporter.GenerateClassConstructor(transition.Opr2, stream, indent, "opr2");
+                RightValueCppExporter.GenerateClassConstructor(attachment, transition.Opr2, stream, indent, "opr2");
             }
         }
 
@@ -87,8 +87,8 @@ namespace PluginBehaviac.NodeExporters
             {
                 string typeName = Plugin.GetNativeTypeName(transition.Opl.ValueType);
 
-                RightValueCppExporter.GenerateCode(transition.Opl, stream, indent + "\t\t\t", typeName, "opl", "");
-                RightValueCppExporter.GenerateCode(transition.Opr2, stream, indent + "\t\t\t", typeName, "opr2", "");
+                RightValueCppExporter.GenerateCode(attachment, transition.Opl, stream, indent + "\t\t\t", typeName, "opl", "");
+                RightValueCppExporter.GenerateCode(attachment, transition.Opr2, stream, indent + "\t\t\t", typeName, "opr2", "");
 
                 if (transition.Opl != null && transition.Opl.IsMethod)
                 {

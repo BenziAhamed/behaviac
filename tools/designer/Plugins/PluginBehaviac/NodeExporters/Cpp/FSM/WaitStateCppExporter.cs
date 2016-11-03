@@ -41,7 +41,7 @@ namespace PluginBehaviac.NodeExporters
 
             if (waitState.Time != null)
             {
-                RightValueCppExporter.GenerateClassConstructor(waitState.Time, stream, indent, "Time");
+                RightValueCppExporter.GenerateClassConstructor(node, waitState.Time, stream, indent, "Time");
             }
         }
 
@@ -73,7 +73,7 @@ namespace PluginBehaviac.NodeExporters
                 stream.WriteLine("{0}\t\t{{", indent);
                 stream.WriteLine("{0}\t\t\tBEHAVIAC_UNUSED_VAR(pAgent);", indent);
 
-                string retStr = RightValueCppExporter.GenerateCode(waitState.Time, stream, indent + "\t\t\t", string.Empty, string.Empty, "Time");
+                string retStr = RightValueCppExporter.GenerateCode(node, waitState.Time, stream, indent + "\t\t\t", string.Empty, string.Empty, "Time");
 
                 stream.WriteLine("{0}\t\t\treturn {1};", indent, retStr);
                 stream.WriteLine("{0}\t\t}}", indent);

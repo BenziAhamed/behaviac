@@ -5756,7 +5756,7 @@ namespace behaviac
 		protected override EBTStatus update_impl(behaviac.Agent pAgent, behaviac.EBTStatus childStatus)
 		{
 			EBTStatus result = EBTStatus.BT_SUCCESS;
-			behaviac.Agent pAgent_opr = behaviac.Utils.GetParentAgent(pAgent, "par_child");
+			behaviac.Agent pAgent_opr = ((AgentNodeTest)pAgent).par_child;
 			Debug.Check(pAgent_opr != null || Utils.IsStaticClass("par_child"));
 			int opr = ((AgentNodeTest)pAgent_opr).testVar_1;
 			((AgentNodeTest)pAgent).testVar_0 = opr;
@@ -5773,7 +5773,7 @@ namespace behaviac
 		protected override EBTStatus update_impl(behaviac.Agent pAgent, behaviac.EBTStatus childStatus)
 		{
 			int opl = ((AgentNodeTest)pAgent).testVar_0;
-			behaviac.Agent pAgent_opr = behaviac.Utils.GetParentAgent(pAgent, "par_child");
+			behaviac.Agent pAgent_opr = ((AgentNodeTest)pAgent).par_child;
 			Debug.Check(pAgent_opr != null || Utils.IsStaticClass("par_child"));
 			int opr = ((AgentNodeTest)pAgent_opr).testVar_1;
 			bool op = opl == opr;
@@ -5790,7 +5790,7 @@ namespace behaviac
 		protected override EBTStatus update_impl(behaviac.Agent pAgent, behaviac.EBTStatus childStatus)
 		{
 			EBTStatus result = EBTStatus.BT_SUCCESS;
-			behaviac.Agent pAgent_opr = behaviac.Utils.GetParentAgent(pAgent, "par_child");
+			behaviac.Agent pAgent_opr = ((AgentNodeTest)pAgent).par_child;
 			Debug.Check(pAgent_opr != null || Utils.IsStaticClass("par_child"));
 			int opr = (int)((AgentNodeTest)pAgent_opr).getConstOne();
 			((AgentNodeTest)pAgent).testVar_0 = opr;
@@ -5821,7 +5821,7 @@ namespace behaviac
 		}
 		protected override EBTStatus update_impl(behaviac.Agent pAgent, behaviac.EBTStatus childStatus)
 		{
-			behaviac.Agent pAgent_opl = behaviac.Utils.GetParentAgent(pAgent, "par_child");
+			behaviac.Agent pAgent_opl = ((AgentNodeTest)pAgent).par_child;
 			Debug.Check(pAgent_opl != null || Utils.IsStaticClass("par_child"));
 			float opl = ((AgentNodeTest)pAgent_opl).testVar_2;
 			float opr = ((AgentNodeTest)pAgent).testVar_3;
@@ -5840,7 +5840,7 @@ namespace behaviac
 		}
 		protected override EBTStatus update_impl(behaviac.Agent pAgent, behaviac.EBTStatus childStatus)
 		{
-			behaviac.Agent pAgent_method = behaviac.Utils.GetParentAgent(pAgent, "par_child");
+			behaviac.Agent pAgent_method = ((AgentNodeTest)pAgent).par_child;
 			Debug.Check(pAgent_method != null || Utils.IsStaticClass("par_child"));
 			AgentMetaVisitor.ExecuteMethod(pAgent_method, "SelectTarget", method_params);
 			return EBTStatus.BT_SUCCESS;

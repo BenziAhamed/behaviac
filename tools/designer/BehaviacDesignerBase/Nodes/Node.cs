@@ -497,19 +497,27 @@ namespace Behaviac.Design.Nodes
             }
         }
 
-        public void ResetId(bool setChildren) {
+        public void ResetId(bool setChildren)
+        {
             Node root = (Node)this.Behavior;
 
-            if (Id == -1 || null != Plugin.GetPreviousObjectById(root, Id, this)) {
+            if (Id < 0 || null != Plugin.GetPreviousObjectById(root, Id, this))
+            {
                 Id = Plugin.NewNodeId(root);
             }
 
-            foreach(Attachments.Attachment attach in this.Attachments) {
-                attach.Id = Plugin.NewNodeId(root);
+            foreach (Attachments.Attachment attach in this.Attachments)
+            {
+                if (attach.Id < 0 || null != Plugin.GetPreviousObjectById(root, attach.Id, attach))
+                {
+                    attach.Id = Plugin.NewNodeId(root);
+                }
             }
 
-            if (setChildren && !(this is ReferencedBehavior)) {
-                foreach(Node child in this.GetChildNodes()) {
+            if (setChildren && !(this is ReferencedBehavior))
+            {
+                foreach (Node child in this.GetChildNodes())
+                {
                     child.ResetId(setChildren);
                 }
             }
@@ -586,6 +594,74 @@ namespace Behaviac.Design.Nodes
         /// <returns>Returns the value for ExportType</returns>
         protected virtual string GetExportType() {
             return GetType().Name;
+        }
+
+        public bool ReplaceNode(Node node)
+        {
+            if (node == null || !node.IsFSM && node.ParentConnector == null)
+            {
+                return false;
+            }
+
+            bool replaced = (node.Children.Count == 0);
+
+            if (!replaced && this.CanAdoptChildren(node))
+            {
+                foreach (Node.Connector connector in node.Connectors)
+                {
+                    Node.Connector newConnector = this.GetConnector(connector.Identifier);
+
+                    if (newConnector != null)
+                    {
+                        for (int i = 0; i < connector.ChildCount; ++i)
+                        {
+                            replaced |= this.AddChild(newConnector, (Node)connector.GetChild(i));
+                        }
+
+                        connector.ClearChildrenInternal();
+                    }
+                }
+            }
+
+            if (replaced)
+            {
+                this.Id = node.Id;
+                this.PrefabName = node.PrefabName;
+                this.PrefabNodeId = node.PrefabNodeId;
+                this.HasOwnPrefabData = node.HasOwnPrefabData;
+                this.CommentObject = node.CommentObject;
+
+                Node parentNode = (Node)node.Parent;
+
+                if (node.IsFSM)
+                {
+                    Debug.Check(this.IsFSM);
+
+                    parentNode.RemoveFSMNode(node);
+                    parentNode.AddFSMNode(this);
+
+                    this.ScreenLocation = node.ScreenLocation;
+                }
+                else
+                {
+                    Node.Connector parentConnector = node.ParentConnector;
+                    Debug.Check(parentConnector != null);
+
+                    int index = parentConnector.GetChildIndex(node);
+                    Debug.Check(index >= 0);
+
+                    parentNode.RemoveChild(parentConnector, node);
+                    parentNode.AddChild(parentConnector, this, index);
+                }
+
+                foreach (Attachments.Attachment attach in node.Attachments)
+                {
+                    if (attach != null && this.AcceptsAttachment(attach))
+                        this.AddAttachment(attach);
+                }
+            }
+
+            return replaced;
         }
 
         public bool SetPrefab(string prefabName, bool prefabDirty = false, string oldPrefabName = "") {
@@ -674,10 +750,15 @@ namespace Behaviac.Design.Nodes
             return reset;
         }
 
+        private bool checkPrefab(string prefabName, Node prefabNode)
+        {
+            return !this.HasOwnPrefabData && this.PrefabName == prefabName && this.PrefabNodeId == prefabNode.Id;
+        }
+
         public bool ResetByPrefab(string prefabName, Node prefabNode) {
             bool reset = false;
 
-            if (!this.HasOwnPrefabData && this.PrefabName == prefabName && this.PrefabNodeId == prefabNode.Id) {
+            if (this.checkPrefab(prefabName, prefabNode)) {
                 reset = true;
 
                 int preId = this.Id;
@@ -685,7 +766,10 @@ namespace Behaviac.Design.Nodes
                 int prePrefabNodeId = this.PrefabNodeId;
                 Comment preComment = (this.CommentObject != null) ? this.CommentObject.Clone() : null;
 
-                prefabNode.CloneProperties(this);
+                if (prefabNode.GetType() == this.GetType())
+                {
+                    prefabNode.CloneProperties(this);
+                }
 
                 this.Id = preId;
                 this.PrefabName = prePrefabName;
@@ -755,9 +839,23 @@ namespace Behaviac.Design.Nodes
                 }
             }
 
-            if (!(this is ReferencedBehavior)) {
-                foreach(Node child in this.Children) {
-                    reset |= child.ResetByPrefab(prefabName, prefabNode);
+            if (!(this is ReferencedBehavior))
+            {
+                for (int i = 0; i < this.Children.Count; ++i)
+                {
+                    Node child = this.Children[i] as Node;
+                    if (child.checkPrefab(prefabName, prefabNode))
+                    {
+                        if (child.GetType() != prefabNode.GetType()) // replace
+                        {
+                            Node newNode = prefabNode.Clone() as Node;
+                            newNode.ReplaceNode(child);
+
+                            child = newNode;
+                        }
+
+                        reset |= child.ResetByPrefab(prefabName, prefabNode);
+                    }
                 }
             }
 

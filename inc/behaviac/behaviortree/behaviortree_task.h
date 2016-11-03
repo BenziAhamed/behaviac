@@ -133,13 +133,13 @@ namespace behaviac
 
         an event can be configured to stop being checked if triggered
         */
-        bool CheckEvents(const char* eventName, Agent* pAgent) const;
+		bool CheckEvents(const char* eventName, Agent* pAgent, bool bStateStackPushed, bool& bFired) const;
 
         /**
         return false if the event handling  needs to be stopped
         return true, the event hanlding will be checked furtherly
         */
-        virtual bool onevent(Agent* pAgent, const char* eventName);
+		virtual bool onevent(Agent* pAgent, const char* eventName, bool bStateStackPushed, bool& bFired);
 
         virtual const BehaviorTask* GetTaskById(int id) const;
         virtual int GetNextStateId() const;
@@ -228,7 +228,7 @@ namespace behaviac
         virtual void save(ISerializableNode* node) const;
         virtual void load(ISerializableNode* node);
 
-        virtual bool onevent(Agent* pAgent, const char* eventName);
+		virtual bool onevent(Agent* pAgent, const char* eventName, bool bStateStackPushed, bool& bFired);
     };
 
     // ============================================================================
@@ -259,14 +259,14 @@ namespace behaviac
 
 		EBTStatus execCurrentTask(Agent* pAgent, EBTStatus childStatus);
 
-        virtual bool onevent(Agent* pAgent, const char* eventName);
+		virtual bool onevent(Agent* pAgent, const char* eventName, bool bStateStackPushed, bool& bFired);
 
         virtual bool onenter(Agent* pAgent);
         virtual void onexit(Agent* pAgent, EBTStatus s);
         virtual EBTStatus update_current(Agent* pAgent, EBTStatus childStatus);
         EBTStatus resume_branch(Agent* pAgent, EBTStatus status);
     private:
-        bool oneventCurrentNode(Agent* pAgent, const char* eventName);
+		bool oneventCurrentNode(Agent* pAgent, const char* eventName, bool bStateStackPushed, bool& bFired);
 
     protected:
         //bookmark the current ticking node, it is different from m_activeChildIndex
@@ -402,7 +402,7 @@ namespace behaviac
         return false if the event handling  needs to be stopped
         return true, the event hanlding will be checked furtherly
         */
-        virtual bool onevent(Agent* pAgent, const char* eventName);
+		virtual bool onevent(Agent* pAgent, const char* eventName, bool bStateStackPushed, bool& bFired);
 
     private:
         bool load(const char* file);

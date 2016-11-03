@@ -39,12 +39,12 @@ namespace PluginBehaviac.NodeExporters
 
             if (condition.Opl != null)
             {
-                RightValueCppExporter.GenerateClassConstructor(condition.Opl, stream, indent, "opl");
+                RightValueCppExporter.GenerateClassConstructor(node, condition.Opl, stream, indent, "opl");
             }
 
             if (condition.Opr != null)
             {
-                RightValueCppExporter.GenerateClassConstructor(condition.Opr, stream, indent, "opr");
+                RightValueCppExporter.GenerateClassConstructor(node, condition.Opr, stream, indent, "opr");
             }
         }
 
@@ -67,7 +67,7 @@ namespace PluginBehaviac.NodeExporters
             }
         }
 
-        public static void GenerateOperand(StreamWriter stream, string indent, RightValueDef operand, string operandName, string nodeName)
+        public static void GenerateOperand(DefaultObject defaltObj, StreamWriter stream, string indent, RightValueDef operand, string operandName, string nodeName)
         {
             if (operand != null)
             {
@@ -75,7 +75,7 @@ namespace PluginBehaviac.NodeExporters
 
                 if (operand.IsMethod) // method
                 {
-                    RightValueCppExporter.GenerateCode(operand, stream, indent, typeName, operandName, string.Empty);
+                    RightValueCppExporter.GenerateCode(defaltObj, operand, stream, indent, typeName, operandName, string.Empty);
                     RightValueCppExporter.PostGenerateCode(operand, stream, indent, typeName, operandName, string.Empty);
                 }
                 else
@@ -88,12 +88,12 @@ namespace PluginBehaviac.NodeExporters
                             PropertyDef prop = var.Property;
                             if (prop != null)
                             {
-                                string property = PropertyCppExporter.GetProperty(prop, var.ArrayIndexElement, stream, indent, operandName, nodeName);
+                                string property = PropertyCppExporter.GetProperty(defaltObj, prop, var.ArrayIndexElement, stream, indent, operandName, nodeName);
                                 string propName = prop.BasicName.Replace("[]", "");
 
                                 if (prop.IsArrayElement && var.ArrayIndexElement != null)
                                 {
-                                    ParameterCppExporter.GenerateCode(var.ArrayIndexElement, stream, indent, "int", operandName + "_index", nodeName + "_opl");
+                                    ParameterCppExporter.GenerateCode(defaltObj, var.ArrayIndexElement, stream, indent, "int", operandName + "_index", nodeName + "_opl");
                                     property = string.Format("({0})[{1}_index]", property, operandName);
                                 }
 
@@ -102,7 +102,7 @@ namespace PluginBehaviac.NodeExporters
                         }
                         else if (var.IsConst) // const
                         {
-                            RightValueCppExporter.GenerateCode(operand, stream, indent, typeName, operandName, string.Empty);
+                            RightValueCppExporter.GenerateCode(defaltObj, operand, stream, indent, typeName, operandName, string.Empty);
                         }
                     }
                 }
@@ -123,10 +123,10 @@ namespace PluginBehaviac.NodeExporters
             stream.WriteLine("{0}\t\t\tBEHAVIAC_UNUSED_VAR(childStatus);", indent);
 
             // opl
-            ConditionCppExporter.GenerateOperand(stream, indent + "\t\t\t", condition.Opl, "opl", "condition");
+            ConditionCppExporter.GenerateOperand(node, stream, indent + "\t\t\t", condition.Opl, "opl", "condition");
 
             // opr
-            ConditionCppExporter.GenerateOperand(stream, indent + "\t\t\t", condition.Opr, "opr", "condition");
+            ConditionCppExporter.GenerateOperand(node, stream, indent + "\t\t\t", condition.Opr, "opr", "condition");
 
             // Operator
             switch (condition.Operator)

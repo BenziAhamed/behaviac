@@ -177,7 +177,7 @@ namespace PluginBehaviac.DataExporters
         /// <param name="var">The variable for the given object when generating the codes.</param>
         /// <param name="caller">The caller for the method or the agent.</param>
         /// <returns>Returns the string generated value.</returns>
-        public static string GenerateCode(object obj, StreamWriter stream, string indent, string typename, string var, string caller)
+        public static string GenerateCode(object obj, DefaultObject defaultObj, StreamWriter stream, string indent, string typename, string var, string caller)
         {
             string retStr = string.Empty;
 
@@ -188,12 +188,12 @@ namespace PluginBehaviac.DataExporters
                 if (obj is Behaviac.Design.MethodDef)
                 {
                     Behaviac.Design.MethodDef method = obj as Behaviac.Design.MethodDef;
-                    retStr = MethodCppExporter.GenerateCode(method, stream, indent, typename, var, caller);
+                    retStr = MethodCppExporter.GenerateCode(defaultObj, method, stream, indent, typename, var, caller);
                 }
                 else if (obj is Behaviac.Design.MethodDef.Param)
                 {
                     Behaviac.Design.MethodDef.Param param = obj as Behaviac.Design.MethodDef.Param;
-                    retStr = ParameterCppExporter.GenerateCode(param, stream, indent, typename, var, caller);
+                    retStr = ParameterCppExporter.GenerateCode(defaultObj, param, stream, indent, typename, var, caller);
                 }
                 else if (obj is Behaviac.Design.ParInfo)
                 {
@@ -203,17 +203,17 @@ namespace PluginBehaviac.DataExporters
                 else if (obj is Behaviac.Design.PropertyDef)
                 {
                     Behaviac.Design.PropertyDef property = obj as Behaviac.Design.PropertyDef;
-                    retStr = PropertyCppExporter.GenerateCode(property, null, false, stream, indent, typename, var, caller);
+                    retStr = PropertyCppExporter.GenerateCode(defaultObj, property, null, false, stream, indent, typename, var, caller);
                 }
                 else if (obj is Behaviac.Design.VariableDef)
                 {
                     Behaviac.Design.VariableDef variable = obj as Behaviac.Design.VariableDef;
-                    retStr = VariableCppExporter.GenerateCode(variable, false, stream, indent, typename, var, caller);
+                    retStr = VariableCppExporter.GenerateCode(defaultObj, variable, false, stream, indent, typename, var, caller);
                 }
                 else if (obj is Behaviac.Design.RightValueDef)
                 {
                     Behaviac.Design.RightValueDef rightValue = obj as Behaviac.Design.RightValueDef;
-                    retStr = RightValueCppExporter.GenerateCode(rightValue, stream, indent, typename, var, caller);
+                    retStr = RightValueCppExporter.GenerateCode(defaultObj, rightValue, stream, indent, typename, var, caller);
                 }
                 // Array type
                 else if (Plugin.IsArrayType(type))
@@ -233,7 +233,7 @@ namespace PluginBehaviac.DataExporters
                     int endIndex = typename.LastIndexOf('>');
                     string itemType = typename.Substring(startIndex + 1, endIndex - startIndex - 1);
 
-                    ArrayCppExporter.GenerateCode(obj, stream, indent, itemType, var);
+                    ArrayCppExporter.GenerateCode(obj, defaultObj, stream, indent, itemType, var);
                 }
                 // Struct type
                 else if (Plugin.IsCustomClassType(type))
@@ -252,7 +252,7 @@ namespace PluginBehaviac.DataExporters
                         }
                     }
 
-                    StructCppExporter.GenerateCode(obj, stream, indent, var, null, "");
+                    StructCppExporter.GenerateCode(obj, defaultObj, stream, indent, var, null, "");
                 }
                 // Other types
                 else

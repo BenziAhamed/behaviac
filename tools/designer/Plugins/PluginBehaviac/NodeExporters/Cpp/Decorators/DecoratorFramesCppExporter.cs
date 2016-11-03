@@ -40,7 +40,7 @@ namespace PluginBehaviac.NodeExporters
 
             if (decoratorFrames.Frames != null)
             {
-                RightValueCppExporter.GenerateClassConstructor(decoratorFrames.Frames, stream, indent, "Frames");
+                RightValueCppExporter.GenerateClassConstructor(node, decoratorFrames.Frames, stream, indent, "Frames");
             }
         }
 
@@ -72,7 +72,7 @@ namespace PluginBehaviac.NodeExporters
                 stream.WriteLine("{0}\t\t{{", indent);
                 stream.WriteLine("{0}\t\t\tBEHAVIAC_UNUSED_VAR(pAgent);", indent);
 
-                string retStr = RightValueCppExporter.GenerateCode(decoratorFrames.Frames, stream, indent + "\t\t\t", string.Empty, string.Empty, "Frames");
+                string retStr = RightValueCppExporter.GenerateCode(node, decoratorFrames.Frames, stream, indent + "\t\t\t", string.Empty, string.Empty, "Frames");
 
                 stream.WriteLine("{0}\t\t\treturn {1};", indent, retStr);
                 stream.WriteLine("{0}\t\t}}", indent);

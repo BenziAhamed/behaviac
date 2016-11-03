@@ -21,13 +21,13 @@ namespace PluginBehaviac.DataExporters
 {
     public class PropertyCsExporter
     {
-        public static string GenerateCode(Behaviac.Design.PropertyDef property, MethodDef.Param arrayIndexElement, bool isRefParam, StreamWriter stream, string indent, string typename, string var, string caller, string setValue = null)
+        public static string GenerateCode(DefaultObject defaultObj, PropertyDef property, MethodDef.Param arrayIndexElement, bool isRefParam, StreamWriter stream, string indent, string typename, string var, string caller, string setValue = null)
         {
             if (property.IsPar || property.IsCustomized)
                 return ParInfoCsExporter.GenerateCode(property, isRefParam, stream, indent, typename, var, caller);
 
             string agentName = GetGenerateAgentName(property, var, caller);
-            string prop = GetProperty(property, arrayIndexElement, stream, indent, var, caller);
+            string prop = GetProperty(defaultObj, property, arrayIndexElement, stream, indent, var, caller);
 
             if (setValue == null)
             {
@@ -103,7 +103,7 @@ namespace PluginBehaviac.DataExporters
             return agentName;
         }
 
-        private static string getProperty(Behaviac.Design.PropertyDef property, MethodDef.Param arrayIndexElement, string agentName, StreamWriter stream, string indent)
+        private static string getProperty(PropertyDef property, MethodDef.Param arrayIndexElement, string agentName, StreamWriter stream, string indent)
         {
             if (property.IsPar || property.IsCustomized)
                 return ParInfoCsExporter.GetProperty(agentName, property, arrayIndexElement, stream, indent);
@@ -128,21 +128,55 @@ namespace PluginBehaviac.DataExporters
             return string.Format("({0})AgentMetaVisitor.GetProperty({1}, \"{2}\")", nativeType, agentName, propName);
         }
 
-        public static string GetProperty(Behaviac.Design.PropertyDef property, MethodDef.Param arrayIndexElement, StreamWriter stream, string indent, string var, string caller)
+        public static string GetProperty(DefaultObject defaultObj, Behaviac.Design.PropertyDef property, MethodDef.Param arrayIndexElement, StreamWriter stream, string indent, string var, string caller)
         {
             string agentName = GetGenerateAgentName(property, var, caller);
 
             if (property.Owner != Behaviac.Design.VariableDef.kSelf)
             {
                 string instanceName = property.Owner.Replace("::", ".");
+                bool isGlobal = Plugin.IsInstanceName(instanceName, null);
+                PropertyDef ownerProperty = null;
 
-                stream.WriteLine("{0}behaviac.Agent {1} = behaviac.Utils.GetParentAgent(pAgent, \"{2}\");", indent, agentName, instanceName);
+                if (!isGlobal)
+                {
+                    Debug.Check(defaultObj != null && defaultObj.Behavior != null && defaultObj.Behavior.AgentType != null);
+                    ownerProperty = defaultObj.Behavior.AgentType.GetPropertyByName(instanceName);
+                }
+
+                if (isGlobal || ownerProperty == null || ownerProperty.IsCustomized) // global or customized instance
+                {
+                    stream.WriteLine("{0}behaviac.Agent {1} = behaviac.Utils.GetParentAgent(pAgent, \"{2}\");", indent, agentName, instanceName);
+                }
+                else // member instance
+                {
+                    string prop = "";
+
+                    if (ownerProperty.IsPublic)
+                    {
+                        string className = ownerProperty.ClassName.Replace("::", ".");
+
+                        if (ownerProperty.IsStatic)
+                        {
+                            prop = string.Format("{0}.{1}", className, instanceName);
+                        }
+                        else
+                        {
+                            prop = string.Format("(({0})pAgent).{1}", className, instanceName);
+                        }
+                    }
+                    else
+                    {
+                        string nativeType = DataCsExporter.GetGeneratedNativeType(ownerProperty.NativeType);
+                        prop = string.Format("({0})AgentMetaVisitor.GetProperty(pAgent, \"{1}\")", nativeType, instanceName);
+                    }
+
+                    stream.WriteLine("{0}behaviac.Agent {1} = {2};", indent, agentName, prop);
+                }
                 stream.WriteLine("{0}Debug.Check({1} != null || Utils.IsStaticClass(\"{2}\"));", indent, agentName, instanceName);
             }
 
-            string prop = getProperty(property, arrayIndexElement, agentName, stream, indent);
-
-            return prop;
+            return getProperty(property, arrayIndexElement, agentName, stream, indent);
         }
     }
 }

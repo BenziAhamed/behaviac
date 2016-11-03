@@ -39,12 +39,12 @@ namespace PluginBehaviac.NodeExporters
 
             if (condition.Opl != null)
             {
-                RightValueCsExporter.GenerateClassConstructor(condition.Opl, stream, indent, "opl");
+                RightValueCsExporter.GenerateClassConstructor(node, condition.Opl, stream, indent, "opl");
             }
 
             if (condition.Opr != null)
             {
-                RightValueCsExporter.GenerateClassConstructor(condition.Opr, stream, indent, "opr");
+                RightValueCsExporter.GenerateClassConstructor(node, condition.Opr, stream, indent, "opr");
             }
         }
 
@@ -67,7 +67,7 @@ namespace PluginBehaviac.NodeExporters
             }
         }
 
-        public static void GenerateOperand(StreamWriter stream, string indent, RightValueDef operand, string operandName, string nodeName)
+        public static void GenerateOperand(DefaultObject defaultObj, StreamWriter stream, string indent, RightValueDef operand, string operandName, string nodeName)
         {
             if (operand != null)
             {
@@ -76,7 +76,7 @@ namespace PluginBehaviac.NodeExporters
 
                 if (operand.IsMethod) // method
                 {
-                    RightValueCsExporter.GenerateCode(operand, stream, indent, typeName, operandName, string.Empty);
+                    RightValueCsExporter.GenerateCode(defaultObj, operand, stream, indent, typeName, operandName, string.Empty);
                     RightValueCsExporter.PostGenerateCode(operand, stream, indent, typeName, operandName, string.Empty);
                 }
                 else
@@ -89,12 +89,12 @@ namespace PluginBehaviac.NodeExporters
                             PropertyDef prop = var.Property;
                             if (prop != null)
                             {
-                                string property = PropertyCsExporter.GetProperty(prop, var.ArrayIndexElement, stream, indent, operandName, nodeName);
+                                string property = PropertyCsExporter.GetProperty(defaultObj, prop, var.ArrayIndexElement, stream, indent, operandName, nodeName);
                                 string propName = prop.BasicName.Replace("[]", "");
 
                                 if (prop.IsArrayElement && var.ArrayIndexElement != null)
                                 {
-                                    ParameterCsExporter.GenerateCode(var.ArrayIndexElement, stream, indent, "int", operandName + "_index", nodeName + "_opl");
+                                    ParameterCsExporter.GenerateCode(defaultObj, var.ArrayIndexElement, stream, indent, "int", operandName + "_index", nodeName + "_opl");
                                     property = string.Format("({0})[{1}_index]", property, operandName);
                                 }
 
@@ -103,7 +103,7 @@ namespace PluginBehaviac.NodeExporters
                         }
                         else if (var.IsConst) // const
                         {
-                            RightValueCsExporter.GenerateCode(operand, stream, indent, typeName, operandName, string.Empty);
+                            RightValueCsExporter.GenerateCode(defaultObj, operand, stream, indent, typeName, operandName, string.Empty);
                         }
                     }
                 }
@@ -124,10 +124,10 @@ namespace PluginBehaviac.NodeExporters
             string typeName = DataCsExporter.GetGeneratedNativeType(condition.Opl.ValueType);
 
             // opl
-            ConditionCsExporter.GenerateOperand(stream, indent + "\t\t\t", condition.Opl, "opl", "condition");
+            ConditionCsExporter.GenerateOperand(node, stream, indent + "\t\t\t", condition.Opl, "opl", "condition");
 
             // opr
-            ConditionCsExporter.GenerateOperand(stream, indent + "\t\t\t", condition.Opr, "opr", "condition");
+            ConditionCsExporter.GenerateOperand(node, stream, indent + "\t\t\t", condition.Opr, "opr", "condition");
 
             // Operator
             switch (condition.Operator)

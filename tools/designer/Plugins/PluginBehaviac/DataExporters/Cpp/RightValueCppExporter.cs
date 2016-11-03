@@ -15,21 +15,22 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using Behaviac.Design;
 using Behaviac.Design.Attributes;
 
 namespace PluginBehaviac.DataExporters
 {
     public class RightValueCppExporter
     {
-        public static void GenerateClassConstructor(Behaviac.Design.RightValueDef rightValue, StreamWriter stream, string indent, string var)
+        public static void GenerateClassConstructor(DefaultObject defaultObj, Behaviac.Design.RightValueDef rightValue, StreamWriter stream, string indent, string var)
         {
             if (rightValue.IsMethod)
             {
-                MethodCppExporter.GenerateClassConstructor(rightValue.Method, stream, indent, var);
+                MethodCppExporter.GenerateClassConstructor(defaultObj, rightValue.Method, stream, indent, var);
             }
             else
             {
-                VariableCppExporter.GenerateClassConstructor(rightValue.Var, stream, indent, var);
+                VariableCppExporter.GenerateClassConstructor(defaultObj, rightValue.Var, stream, indent, var);
             }
         }
 
@@ -45,17 +46,17 @@ namespace PluginBehaviac.DataExporters
             }
         }
 
-        public static string GenerateCode(Behaviac.Design.RightValueDef rightValue, StreamWriter stream, string indent, string typename, string var, string caller)
+        public static string GenerateCode(DefaultObject defaultObj, Behaviac.Design.RightValueDef rightValue, StreamWriter stream, string indent, string typename, string var, string caller)
         {
             string retStr = string.Empty;
 
             if (rightValue.IsMethod)
             {
-                retStr = MethodCppExporter.GenerateCode(rightValue.Method, stream, indent, rightValue.Method.NativeReturnType, var, caller);
+                retStr = MethodCppExporter.GenerateCode(defaultObj, rightValue.Method, stream, indent, rightValue.Method.NativeReturnType, var, caller);
             }
             else
             {
-                retStr = VariableCppExporter.GenerateCode(rightValue.Var, false, stream, indent, typename, var, caller);
+                retStr = VariableCppExporter.GenerateCode(defaultObj, rightValue.Var, false, stream, indent, typename, var, caller);
             }
 
             return retStr;

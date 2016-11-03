@@ -354,7 +354,7 @@ namespace behaviac
         }
     }
 
-    bool BehaviorNode::CheckEvents(const char* eventName, Agent* pAgent) const
+	bool BehaviorNode::CheckEvents(const char* eventName, Agent* pAgent, bool bStateStackPushed, bool& bFired) const
     {
         if (this->m_events.size() > 0)
         {
@@ -372,7 +372,10 @@ namespace behaviac
 
                     if (!StringUtils::IsNullOrEmpty(pEventName) && StringUtils::StrEqual(pEventName, eventName))
                     {
-                        pE->switchTo(pAgent);
+						bool bFiredTemp = pE->switchTo(pAgent, bStateStackPushed);
+						if (bFiredTemp) {
+							bFired = true;
+						}
 
                         if (pE->TriggeredOnce())
                         {

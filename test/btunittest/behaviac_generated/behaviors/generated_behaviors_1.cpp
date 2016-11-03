@@ -1585,7 +1585,7 @@ namespace behaviac
 			BEHAVIAC_UNUSED_VAR(pAgent);
 			BEHAVIAC_UNUSED_VAR(childStatus);
 			EBTStatus result = BT_SUCCESS;
-			Agent* pAgent_opr = Agent::GetInstance(pAgent, "par_child");
+			Agent* pAgent_opr = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_par_child, ChildNodeTest* >();
 			BEHAVIAC_ASSERT(pAgent_opr);
 			int opr = ((AgentNodeTest*)pAgent_opr)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_1, int >();
 			((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_0, int >() = opr;
@@ -1606,7 +1606,7 @@ namespace behaviac
 			BEHAVIAC_UNUSED_VAR(pAgent);
 			BEHAVIAC_UNUSED_VAR(childStatus);
 			int& opl = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_0, int >();
-			Agent* pAgent_opr = Agent::GetInstance(pAgent, "par_child");
+			Agent* pAgent_opr = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_par_child, ChildNodeTest* >();
 			BEHAVIAC_ASSERT(pAgent_opr);
 			int& opr = ((AgentNodeTest*)pAgent_opr)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_1, int >();
 			bool op = Details::Equal(opl, opr);
@@ -1627,7 +1627,7 @@ namespace behaviac
 			BEHAVIAC_UNUSED_VAR(pAgent);
 			BEHAVIAC_UNUSED_VAR(childStatus);
 			EBTStatus result = BT_SUCCESS;
-			Agent* pAgent_opr = Agent::GetInstance(pAgent, "par_child");
+			Agent* pAgent_opr = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_par_child, ChildNodeTest* >();
 			BEHAVIAC_ASSERT(pAgent_opr);
 			int opr = ((AgentNodeTest*)pAgent_opr)->_Execute_Method_<METHOD_TYPE_AgentNodeTest_getConstOne, int >();
 			((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_0, int >() = opr;
@@ -1666,7 +1666,7 @@ namespace behaviac
 		{
 			BEHAVIAC_UNUSED_VAR(pAgent);
 			BEHAVIAC_UNUSED_VAR(childStatus);
-			Agent* pAgent_opl = Agent::GetInstance(pAgent, "par_child");
+			Agent* pAgent_opl = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_par_child, ChildNodeTest* >();
 			BEHAVIAC_ASSERT(pAgent_opl);
 			float& opl = ((AgentNodeTest*)pAgent_opl)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_2, float >();
 			float& opr = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_3, float >();
@@ -1687,7 +1687,7 @@ namespace behaviac
 		{
 			BEHAVIAC_UNUSED_VAR(pAgent);
 			BEHAVIAC_UNUSED_VAR(childStatus);
-			Agent* pAgent_method = Agent::GetInstance(pAgent, "par_child");
+			Agent* pAgent_method = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_par_child, ChildNodeTest* >();
 			BEHAVIAC_ASSERT(pAgent_method);
 			((AgentNodeTest*)pAgent_method)->_Execute_Method_<METHOD_TYPE_AgentNodeTest_SelectTarget, void >();
 			return BT_SUCCESS;

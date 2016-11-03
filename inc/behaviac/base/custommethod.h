@@ -115,7 +115,7 @@ namespace behaviac
             return this->m_bFired;
         }
 
-        void SetFired(Agent* pAgent, bool bFired);
+        bool SetFired(Agent* pAgent, bool bFired, int paramsCount);
 
         template<typename ParamType>
 		void SetParam(Agent* pAgent, const ParamType& param);

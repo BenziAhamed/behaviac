@@ -59,7 +59,7 @@ namespace PluginBehaviac.NodeExporters
 
             if (state.Method != null && !isNullMethod(state.Method))
             {
-                MethodCsExporter.GenerateClassConstructor(state.Method, stream, indent, "method");
+                MethodCsExporter.GenerateClassConstructor(node, state.Method, stream, indent, "method");
             }
         }
 
@@ -90,7 +90,7 @@ namespace PluginBehaviac.NodeExporters
 
             if (state.Method != null && !isNullMethod(state.Method))
             {
-                string method = MethodCsExporter.GenerateCode(state.Method, stream, indent + "\t\t\t", string.Empty, string.Empty, "method");
+                string method = MethodCsExporter.GenerateCode(node, state.Method, stream, indent + "\t\t\t", string.Empty, string.Empty, "method");
                 stream.WriteLine("{0}\t\t\t{1};", indent, method);
 
                 MethodCsExporter.PostGenerateCode(state.Method, stream, indent + "\t\t\t", string.Empty, string.Empty, "method");
