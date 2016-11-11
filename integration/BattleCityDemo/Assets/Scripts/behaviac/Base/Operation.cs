@@ -409,7 +409,7 @@ namespace behaviac
     public interface ICompareValue
     {
         bool ItemEqual(IList ll, IList rl, int index);
-        bool MemberEqual(object lo, object ro, FieldInfo field);
+        bool MemberEqual<U>(U lo, U ro, FieldInfo field);
     }
 
     public class ICompareValue<T> :  ICompareValue
@@ -425,7 +425,7 @@ namespace behaviac
             return OperationUtils.Compare<T>(l, r, EOperatorType.E_EQUAL);
         }
 
-        public bool MemberEqual(object lo, object ro, FieldInfo field)
+        public bool MemberEqual<U>(U lo, U ro, FieldInfo field)
         {
             //possible boxing
             T l = (T)field.GetValue(lo);
@@ -748,6 +748,39 @@ namespace behaviac
 
     }
 
+    public class CompareValueChar : ICompareValue<char>
+    {
+        public override bool Equal(char lhs, char rhs)
+        {
+            return lhs == rhs;
+        }
+        public override bool NotEqual(char lhs, char rhs)
+        {
+            return lhs != rhs;
+        }
+
+        public override bool Greater(char lhs, char rhs)
+        {
+            return (lhs > rhs);
+        }
+
+        public override bool GreaterEqual(char lhs, char rhs)
+        {
+            return (lhs >= rhs);
+        }
+
+        public override bool Less(char lhs, char rhs)
+        {
+            return (lhs < rhs);
+        }
+
+        public override bool LessEqual(char lhs, char rhs)
+        {
+            return (lhs <= rhs);
+        }
+
+    }
+
     public class CompareValueFloat : ICompareValue<float>
     {
         public override bool Equal(float lhs, float rhs)
@@ -939,6 +972,11 @@ namespace behaviac
             }
 
             {
+                CompareValueChar pComparer = new CompareValueChar();
+                ms_valueComparers.Add(typeof(char), pComparer);
+            }
+
+            {
                 CompareValueFloat pComparer = new CompareValueFloat();
                 ms_valueComparers.Add(typeof(float), pComparer);
             }
@@ -969,7 +1007,15 @@ namespace behaviac
         public static void Cleanup()
         {
             ms_valueComparers.Clear();
+
+            //ms_valueComparers.UnRegister();
             ms_valueComparers = null;
+        }
+
+        public static void RegisterType<T, TCOMPARER>() where TCOMPARER : ICompareValue, new() 
+        {
+            TCOMPARER pComparer = new TCOMPARER();
+            ms_valueComparers.Add(typeof(T), pComparer);
         }
 
         public static ICompareValue<T> Get<T>()
@@ -1422,32 +1468,11 @@ namespace behaviac
             return c.Div(left, right);
         }
 
-        private static bool MemberEqual(T left, T right)
+        private static bool EqualByMember(T left, T right)
         {
-            //if a value type
-            if (left is ValueType)
-            {
-                return left.Equals(right);
-            }
-
-            if (Object.ReferenceEquals(left, right))
-            {
-                return true;
-            }
-
-            if (left == null || right == null)
-            {
-                return false;
-            }
-
-            Type type = left.GetType();
-            if (type != right.GetType())
-            {
-                return false;
-            }
-
             //not a list
             Debug.Check(!(left is IList));
+            Type type = typeof(T);
 
             BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
             FieldInfo[] fields = type.GetFields(bindingFlags);
@@ -1455,12 +1480,44 @@ namespace behaviac
             {
                 FieldInfo field = fields[i];
 
+                if (field.IsLiteral || field.IsInitOnly)
+                {
+                    continue;
+                }
+
                 ICompareValue c = ComparerRegister.Get(field.FieldType);
 
-                bool bEqual = c.MemberEqual(left, right, field);
-                if (!bEqual)
+                if (c != null)
                 {
-                    return false;
+                    bool bEqual = c.MemberEqual(left, right, field);
+                    if (!bEqual)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    //Debug.LogWarning(string.Format("Type {0} Equal might cause GC, please provide ComparerRegister for it!", field.FieldType.Name));
+
+                    object l = field.GetValue(left);
+                    object r = field.GetValue(right);
+
+                    if (l == null && r == null)
+                    {
+                        //both are null, they are equal
+                    }
+                    else if (l == null || r == null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        bool bEqual = l.Equals(r);
+                        if (!bEqual)
+                        {
+                            return false;
+                        }
+                    }
                 }
             }
 
@@ -1472,15 +1529,8 @@ namespace behaviac
             ICompareValue<T> c = ComparerRegister.Get<T>();
             if (c == null)
             {
-                Type type = typeof(T);
-
-                if (type.IsValueType)
-                {
-                    return left.Equals(right);
-                }
-
                 //class as a struct, it might cause low performance
-                return MemberEqual(left, right);
+                return EqualByMember(left, right);
             }
 
             //if ICompareValue<T> is generated and registered, it will run to here to avoid possible boxing
@@ -1489,17 +1539,6 @@ namespace behaviac
 
         public static bool ListEqual(T left, T right)
         {
-            if (Object.ReferenceEquals(left, right))
-            {
-                return true;
-            }
-
-            if (left == null || right == null)
-            {
-                return false;
-            }
-
-
             IList ll = (left as IList);
             if (ll != null)
             {
@@ -1539,6 +1578,11 @@ namespace behaviac
 
                     return co.Equal(left, right);
                 }
+                else
+                {
+                    //Debug.LogWarning(string.Format("Type {0} Equal might cause GC, please provide ComparerRegister for it!", typeof(T).Name));
+                    return left.Equals(right);
+                }
             }
 
             Debug.Check(c != null);
@@ -1558,6 +1602,11 @@ namespace behaviac
                     ICompareValue<object> co = ComparerRegister.Get<object>();
 
                     return co.NotEqual(left, right);
+                }
+                else
+                {
+                    //Debug.LogWarning(string.Format("Type {0} Equal might cause GC, please provide ComparerRegister for it!", typeof(T).Name));
+                    return !left.Equals(right);
                 }
             }
 
@@ -1639,54 +1688,23 @@ namespace behaviac
 
         public static bool Compare<T>(T left, T right, EOperatorType comparisonType)
         {
-            Type type = typeof(T);
+            bool bLeftNull = (left == null);
+            bool bRightNull = (right == null);
 
-            if (Utils.IsCustomStructType(type))
+            if (bLeftNull && bRightNull)
             {
-                //bool bEqual = MemberCompare(left, right);
-                bool bEqual = Operator<T>.ClassEqual(left, right);
+                // both are null
+                return true;
+            }
+            else if (bLeftNull || bRightNull)
+            {
+                // one is null and ther other one is not null
+                return false;
+            }
 
-                switch (comparisonType)
-                {
-                    case EOperatorType.E_EQUAL: return bEqual;
-                    case EOperatorType.E_NOTEQUAL: return !bEqual;
-                }
-            }
-            else if (Utils.IsArrayType(type))
-            {
-                //bool bEqual = MemberCompare(left, right);
-                bool bEqual = Operator<T>.ListEqual(left, right);
+            ICompareValue<T> c = ComparerRegister.Get<T>();
 
-                switch (comparisonType)
-                {
-                    case EOperatorType.E_EQUAL: return bEqual;
-                    case EOperatorType.E_NOTEQUAL: return !bEqual;
-                }
-            }
-            else if (Utils.IsStringType(type) || type == typeof(bool))
-            {
-                switch (comparisonType)
-                {
-                    case EOperatorType.E_EQUAL: return Operator<T>.Equal(left, right);
-                    case EOperatorType.E_NOTEQUAL: return Operator<T>.NotEqual(left, right);
-                }
-            }
-            else if (Utils.IsEnumType(type) || type == typeof(char))
-            {
-                int iLeft = Convert.ToInt32(left);
-                int iRight = Convert.ToInt32(right);
-
-                switch (comparisonType)
-                {
-                    case EOperatorType.E_EQUAL: return Operator<int>.Equal(iLeft, iRight);
-                    case EOperatorType.E_NOTEQUAL: return Operator<int>.NotEqual(iLeft, iRight);
-                    case EOperatorType.E_GREATER: return Operator<int>.GreaterThan(iLeft, iRight);
-                    case EOperatorType.E_GREATEREQUAL: return Operator<int>.GreaterThanOrEqual(iLeft, iRight);
-                    case EOperatorType.E_LESS: return Operator<int>.LessThan(iLeft, iRight);
-                    case EOperatorType.E_LESSEQUAL: return Operator<int>.LessThanOrEqual(iLeft, iRight);
-                }
-            }
-            else
+            if (c != null)
             {
                 switch (comparisonType)
                 {
@@ -1699,7 +1717,60 @@ namespace behaviac
                 }
             }
 
-            Debug.Check(false);
+            Type type = typeof(T);
+            if (!type.IsValueType)
+            {
+                // reference type
+                object l = (object)left;
+                object r = (object)right;
+
+                bool bEqual = Object.ReferenceEquals(l, r);
+                if (bEqual)
+                {
+                    // not equal then, continue check its members below
+                    return true;
+                }
+            }
+
+            if (Utils.IsCustomStructType(type))
+            {
+                bool bEqual = Operator<T>.ClassEqual(left, right);
+
+                switch (comparisonType)
+                {
+                    case EOperatorType.E_EQUAL: return bEqual;
+                    case EOperatorType.E_NOTEQUAL: return !bEqual;
+                }
+            }
+            else if (Utils.IsArrayType(type))
+            {
+                bool bEqual = Operator<T>.ListEqual(left, right);
+
+                switch (comparisonType)
+                {
+                    case EOperatorType.E_EQUAL: return bEqual;
+                    case EOperatorType.E_NOTEQUAL: return !bEqual;
+                }
+            }
+            else if (Utils.IsEnumType(type))
+            {
+                switch (comparisonType)
+                {
+                    case EOperatorType.E_EQUAL: return Operator<T>.Equal(left, right);
+                    case EOperatorType.E_NOTEQUAL: return Operator<T>.NotEqual(left, right);
+                    //case EOperatorType.E_GREATER: return Operator<int>.GreaterThan(iLeft, iRight);
+                    //case EOperatorType.E_GREATEREQUAL: return Operator<int>.GreaterThanOrEqual(iLeft, iRight);
+                    //case EOperatorType.E_LESS: return Operator<int>.LessThan(iLeft, iRight);
+                    //case EOperatorType.E_LESSEQUAL: return Operator<int>.LessThanOrEqual(iLeft, iRight);
+                }
+
+                Debug.Check(false, "enum only supports eq or neq");
+            }
+            else
+            {
+                Debug.Check(false, "unsupported type for compare");
+            }
+
             return false;
         }
 

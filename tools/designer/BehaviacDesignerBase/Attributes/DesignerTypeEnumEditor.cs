@@ -139,7 +139,7 @@ namespace Behaviac.Design.Attributes
                 // reset the properties and methods of the root
                 if (_root != null)
                 {
-                    _root.ResetMembers(false, curType, false);
+                    _root.ResetMembers(MetaOperations.ChangeAgentType, curType, null, null);
                 }
 
                 _property.Property.SetValue(_object, curType, null);

@@ -747,6 +747,10 @@ namespace Behaviac.Design
             _agentsXMLNode = null;
             _typesXMLNode = null;
 
+            Plugin.AllMetaTypes.Clear();
+            TypeManager.Instance.Enums.Clear();
+            TypeManager.Instance.Structs.Clear();
+
             string bbPath = ws.getBlackboardPath();
 
             if (string.IsNullOrEmpty(bbPath) || !File.Exists(bbPath))

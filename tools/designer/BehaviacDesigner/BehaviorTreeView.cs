@@ -1878,7 +1878,7 @@ namespace Behaviac.Design
                                     }
 
                                     // reset its properties and methods
-                                    sourceNode.ResetMembers(false, this.RootNode.AgentType, true);
+                                    sourceNode.ResetMembers(MetaOperations.ChangeAgentType, this.RootNode.AgentType, null, null);
 
                                 } catch {
                                 }

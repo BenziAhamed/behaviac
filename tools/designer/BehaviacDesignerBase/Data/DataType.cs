@@ -1066,66 +1066,86 @@ namespace Behaviac.Design
                     !Plugin.IsAgentDerived(this.AgentType.AgentTypeName, agentType.AgentTypeName));
         }
 
-        public bool ResetMembers(bool check, AgentType agentType, bool clear, MethodDef method, PropertyDef property)
+        public bool ResetMembers(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
         {
-            bool bReset = false;
-
             if (method != null)
             {
                 if (method.OldName == this.Name)
                 {
-                    bReset = true;
-
-                    if (!check)
+                    if (metaOperation == MetaOperations.CheckMethod)
+                    {
+                        return true;
+                    }
+                    else if (metaOperation == MetaOperations.ChangeMethod)
                     {
                         this.CopyFrom(method);
+
+                        return true;
                     }
                 }
             }
             else
             {
+                bool bReset = false;
+
                 foreach (MethodDef.Param param in this.Params)
                 {
                     if (param.Value is VariableDef)
                     {
                         VariableDef var = param.Value as VariableDef;
-                        bReset |= var.ResetMembers(check, agentType, clear, property);
+
+                        bReset |= var.ResetMembers(metaOperation, agentType, method, property);
                     }
                     else if (param.Value is ParInfo)
                     {
-                        ParInfo par = param.Value as ParInfo;
-
-                        if (clear || this.ShouldBeCleared(agentType))
+                        if (metaOperation == MetaOperations.ChangeAgentType || metaOperation == MetaOperations.RemoveAgentType)
                         {
-                            bReset = true;
-
-                            if (!check)
+                            if (this.ShouldBeCleared(agentType))
                             {
+                                bReset = true;
+
                                 param.Value = Plugin.DefaultValue(param.Type);
                             }
                         }
-                        else if (property != null && property.IsPar && (property.OldName == par.Name ||
-                            !property.IsArrayElement && par.IsArrayElement && (property.OldName + "[]") == par.Name))
+                        else if (property != null && property.IsPar)
                         {
-                            bReset = true;
+                            ParInfo par = param.Value as ParInfo;
 
-                            if (!check)
+                            if ((property.OldName == par.Name ||
+                               !property.IsArrayElement && par.IsArrayElement && (property.OldName + "[]") == par.Name))
                             {
-                                bool isArrayElement = par.IsArrayElement;
-
-                                par.CopyFrom(property);
-
-                                if (isArrayElement)
+                                if (metaOperation == MetaOperations.CheckProperty)
                                 {
-                                    par.SetArrayElement(property);
+                                    bReset = true;
+                                }
+                                else if (metaOperation == MetaOperations.ChangeProperty)
+                                {
+                                    bReset = true;
+
+                                    bool isArrayElement = par.IsArrayElement;
+
+                                    par.CopyFrom(property);
+
+                                    if (isArrayElement)
+                                    {
+                                        par.SetArrayElement(property);
+                                    }
+                                }
+                                else if (metaOperation == MetaOperations.RemoveProperty)
+                                {
+                                    bReset = true;
+
+                                    param.Value = Plugin.DefaultValue(param.Type);
                                 }
                             }
                         }
                     }
                 }
+
+                return bReset;
             }
 
-            return bReset;
+            return false;
         }
 
         public override string ToString()
@@ -1983,21 +2003,28 @@ namespace Behaviac.Design
             return false;
         }
 
-        public bool ResetMembers(bool check, AgentType agentType, bool clear, PropertyDef property)
+        public bool ResetMembers(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
         {
             if (this._property != null)
             {
-                if (!check)
+                if (metaOperation == MetaOperations.ChangeAgentType || metaOperation == MetaOperations.RemoveAgentType)
                 {
-                    if (clear || this._property.ShouldBeCleared(agentType))
+                    if (this._property.ShouldBeCleared(agentType))
                     {
                         this._property = null;
 
                         return true;
                     }
-                    else if (property != null &&
-                        (property.OldName == this._property.Name ||
-                        !property.IsArrayElement && this._property.IsArrayElement && (property.OldName + "[]") == this._property.Name))
+                }
+                else if (property != null &&
+                    (property.OldName == this._property.Name ||
+                    !property.IsArrayElement && this._property.IsArrayElement && (property.OldName + "[]") == this._property.Name))
+                {
+                    if (metaOperation == MetaOperations.CheckProperty)
+                    {
+                        return true;
+                    }
+                    else if (metaOperation == MetaOperations.ChangeProperty)
                     {
                         bool isArrayElement = this._property.IsArrayElement;
 
@@ -2007,6 +2034,12 @@ namespace Behaviac.Design
                         {
                             this._property.SetArrayElement(property);
                         }
+
+                        return true;
+                    }
+                    else if (metaOperation == MetaOperations.RemoveProperty)
+                    {
+                        this._property = null;
 
                         return true;
                     }
@@ -2286,31 +2319,44 @@ namespace Behaviac.Design
             return false;
         }
 
-        public bool ResetMembers(bool check, AgentType agentType, bool clear, MethodDef method, PropertyDef property)
+        public bool ResetMembers(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
         {
             if (this.IsMethod && this.Method != null)
             {
-                if (!check)
+                if (metaOperation == MetaOperations.ChangeAgentType || metaOperation == MetaOperations.RemoveAgentType)
                 {
-                    if (clear || this.Method.ShouldBeCleared(agentType))
+                    if (this.Method.ShouldBeCleared(agentType))
                     {
                         this.m_method = null;
 
                         return true;
                     }
-                    else if (method != null && method.OldName == this.Method.Name)
+                }
+                else if (method != null && method.OldName == this.Method.Name)
+                {
+                    if (metaOperation == MetaOperations.CheckMethod)
+                    {
+                        return true;
+                    }
+                    else if (metaOperation == MetaOperations.ChangeMethod)
                     {
                         this.Method.CopyFrom(method);
 
                         return true;
                     }
+                    else if (metaOperation == MetaOperations.RemoveMethod)
+                    {
+                        this.m_method = null;
+
+                        return true;
+                    }
                 }
 
-                return this.Method.ResetMembers(check, agentType, clear, method, property);
+                return this.Method.ResetMembers(metaOperation, agentType, method, property);
             }
             else if (this.Var != null)
             {
-                return this.Var.ResetMembers(check, agentType, clear, property);
+                return this.Var.ResetMembers(metaOperation, agentType, method, property);
             }
 
             return false;
@@ -2596,6 +2642,29 @@ namespace Behaviac.Design
         }
 
         public bool HasCustomizedTypes()
+        {
+            return Enums.Count > 0 || Structs.Count > 0;
+        }
+    }
+
+    public class TypeManager
+    {
+        public List<CustomizedEnum> Enums = new List<CustomizedEnum>();
+        public List<CustomizedStruct> Structs = new List<CustomizedStruct>();
+
+        private static TypeManager _instance = null;
+        public static TypeManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                { _instance = new TypeManager(); }
+
+                return _instance;
+            }
+        }
+
+        public bool HasTypes()
         {
             return Enums.Count > 0 || Structs.Count > 0;
         }

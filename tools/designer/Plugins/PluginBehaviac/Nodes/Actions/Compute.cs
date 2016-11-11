@@ -100,26 +100,26 @@ namespace PluginBehaviac.Nodes
             set { this._opr2 = value; }
         }
 
-        public override bool ResetMembers(bool check, AgentType agentType, bool clear, MethodDef method = null, PropertyDef property = null)
+        public override bool ResetMembers(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
         {
             bool bReset = false;
 
             if (this.Opl != null)
             {
-                bReset |= this.Opl.ResetMembers(check, agentType, clear, property);
+                bReset |= this.Opl.ResetMembers(metaOperation, agentType, method, property);
             }
 
             if (this.Opr1 != null)
             {
-                bReset |= this.Opr1.ResetMembers(check, agentType, clear, method, property);
+                bReset |= this.Opr1.ResetMembers(metaOperation, agentType, method, property);
             }
 
             if (this.Opr2 != null)
             {
-                bReset |= this.Opr2.ResetMembers(check, agentType, clear, method, property);
+                bReset |= this.Opr2.ResetMembers(metaOperation, agentType, method, property);
             }
 
-            bReset |= base.ResetMembers(check, agentType, clear, method, property);
+            bReset |= base.ResetMembers(metaOperation, agentType, method, property);
 
             return bReset;
         }

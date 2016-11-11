@@ -1247,24 +1247,39 @@ namespace Behaviac.Design
             return allBehaviors;
         }
 
-        private bool checkMembersInWorkspace(AgentType agentType, bool clear, MethodDef method, PropertyDef property) {
-            foreach(Nodes.BehaviorNode behavior in getAllBehaviors(property)) {
-                if (behavior != null && behavior is Nodes.Node) {
-                    bool bReset = ((Nodes.Node)behavior).ResetMembers(true, agentType, clear, method, property);
+        private bool checkMembersInWorkspace(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
+        {
+            Debug.Check(metaOperation == MetaOperations.CheckProperty || metaOperation == MetaOperations.CheckMethod);
+
+            foreach (Nodes.BehaviorNode behavior in getAllBehaviors(property))
+            {
+                if (behavior != null && behavior is Nodes.Node)
+                {
+                    bool bReset = ((Nodes.Node)behavior).ResetMembers(metaOperation, agentType, method, property);
                     if (bReset)
+                    {
                         return DialogResult.Yes == MessageBox.Show(Resources.ModifyMemberWarning, Resources.Warning, MessageBoxButtons.YesNo);
+                    }
                 }
             }
 
-            return true;
+            return false;
         }
 
-        private void resetMembersInWorkspace(AgentType agentType, bool clear, MethodDef method, PropertyDef property) {
-            foreach(Nodes.BehaviorNode behavior in getAllBehaviors(property)) {
-                if (behavior != null && behavior is Nodes.Node) {
-                    bool bReset = ((Nodes.Node)behavior).ResetMembers(false, agentType, clear, method, property);
+        private void resetMembersInWorkspace(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
+        {
+            Debug.Check(metaOperation == MetaOperations.ChangeProperty || metaOperation == MetaOperations.ChangeMethod ||
+                metaOperation == MetaOperations.RemoveProperty || metaOperation == MetaOperations.RemoveMethod);
+
+            foreach (Nodes.BehaviorNode behavior in getAllBehaviors(property))
+            {
+                if (behavior != null && behavior is Nodes.Node)
+                {
+                    bool bReset = ((Nodes.Node)behavior).ResetMembers(metaOperation, agentType, method, property);
                     if (bReset)
+                    {
                         UndoManager.Save(behavior);
+                    }
                 }
             }
         }
@@ -1306,7 +1321,7 @@ namespace Behaviac.Design
                                 prop.IsExportedButAlsoCustomized = curProp.IsExportedButAlsoCustomized;
                                 bEdit = true;
                             }
-                            else if ((prop.IsChangeableType || canBeEdit) && (curProp.Name == prop.Name || checkMembersInWorkspace(agent, false, null, curProp)))
+                            else if ((prop.IsChangeableType || canBeEdit) && (curProp.Name == prop.Name || checkMembersInWorkspace(MetaOperations.CheckProperty, agent, null, curProp)))
                             {
                                 if (curProp.IsPar || curProp.IsPar != prop.IsPar)
                                 {
@@ -1315,11 +1330,11 @@ namespace Behaviac.Design
 
                                 if (curProp.Type != prop.Type)
                                 {
-                                    resetMembersInWorkspace(agent, true, null, curProp);
+                                    resetMembersInWorkspace(MetaOperations.RemoveProperty, agent, null, curProp);
                                 }
                                 else if (curProp.Name != prop.Name)
                                 {
-                                    resetMembersInWorkspace(agent, false, null, curProp);
+                                    resetMembersInWorkspace(MetaOperations.ChangeProperty, agent, null, curProp);
                                 }
 
                                 if (Plugin.IsArrayType(prop.Type))
@@ -1400,9 +1415,9 @@ namespace Behaviac.Design
                             MethodDef curMethod = this._metaMethodPanel.GetMethod();
                             Debug.Check(curMethod != null);
 
-                            if ((method.IsChangeableType || method.IsCustomized) && checkMembersInWorkspace(agent, false, curMethod, null))
+                            if ((method.IsChangeableType || method.IsCustomized) && checkMembersInWorkspace(MetaOperations.CheckMethod, agent, curMethod, null))
                             {
-                                resetMembersInWorkspace(agent, false, curMethod, null);
+                                resetMembersInWorkspace(MetaOperations.ChangeMethod, agent, curMethod, null);
 
                                 method.CopyFrom(curMethod);
 
@@ -1507,7 +1522,7 @@ namespace Behaviac.Design
                         }
 
                         if (prop != null && (prop.IsCustomized || prop.IsPar) && !prop.IsAddedAutomatically &&
-                            checkMembersInWorkspace(agent, true, null, prop) &&
+                            checkMembersInWorkspace(MetaOperations.CheckProperty, agent, null, prop) &&
                             agent.RemoveProperty(prop)) {
                             bRemoved = true;
 
@@ -1529,7 +1544,7 @@ namespace Behaviac.Design
 
                             this.memberListBox.SelectedIndex = memberIndex;
 
-                            resetMembersInWorkspace(agent, true, null, prop);
+                            resetMembersInWorkspace(MetaOperations.RemoveProperty, agent, null, prop);
                         }
 
                     } else if (this.memberTypeComboBox.SelectedIndex == (int)MemberType.Method ||
@@ -1541,7 +1556,7 @@ namespace Behaviac.Design
                         }
 
                         if (method != null && method.IsCustomized &&
-                            checkMembersInWorkspace(agent, true, method, null) &&
+                            checkMembersInWorkspace(MetaOperations.CheckMethod, agent, method, null) &&
                             agent.RemoveMethod(method)) {
                             bRemoved = true;
 
@@ -1553,7 +1568,7 @@ namespace Behaviac.Design
 
                             this.memberListBox.SelectedIndex = memberIndex;
 
-                            resetMembersInWorkspace(agent, true, method, null);
+                            resetMembersInWorkspace(MetaOperations.RemoveProperty, agent, method, null);
                         }
                     }
 

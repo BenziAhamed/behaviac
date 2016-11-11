@@ -679,6 +679,9 @@ namespace PluginBehaviac.Exporters
                 file.WriteLine("namespace behaviac");
                 file.WriteLine("{");
 
+                ExportTypeCompare(file);
+                file.WriteLine();
+
                 // AgentMeta
                 file.WriteLine("\tpartial class AgentMeta");
                 file.WriteLine("\t{");
@@ -710,14 +713,19 @@ namespace PluginBehaviac.Exporters
 
                 file.WriteLine();
 
-                //foreach (string type in Plugin.AllMetaTypes)
-                //{
-                //    AgentType agentType = Plugin.GetAgentType(type);
-                //    if (agentType != null)
-                //    {
-                //        file.WriteLine("\t\t\tWorkspace.Instance.AddAgentType(typeof({0}), {1});", type.Replace("::", "."), agentType.IsInherited ? "true" : "false");
-                //    }
-                //}
+                foreach (CustomizedEnum enumType in TypeManager.Instance.Enums)
+                {
+                    string enumFullname = enumType.Name.Replace("::", ".");
+
+                    file.WriteLine("\t\t\tComparerRegister.RegisterType<{0}, CompareValue_{1}>();", enumFullname, enumFullname.Replace(".", "_"));
+                }
+
+                foreach (CustomizedStruct structType in TypeManager.Instance.Structs)
+                {
+                    string structFullname = structType.Name.Replace("::", ".");
+
+                    file.WriteLine("\t\t\tComparerRegister.RegisterType<{0}, CompareValue_{1}>();", structFullname, structFullname.Replace(".", "_"));
+                }
 
                 file.WriteLine("\t\t}");
                 file.WriteLine();
@@ -740,6 +748,94 @@ namespace PluginBehaviac.Exporters
                 file.WriteLine("\t\t}");
                 file.WriteLine("\t}");
                 file.WriteLine("}");
+            }
+        }
+
+        private void ExportTypeCompare(StreamWriter file)
+        {
+            foreach (CustomizedEnum enumType in TypeManager.Instance.Enums)
+            {
+                string enumFullname = enumType.Name.Replace("::", ".");
+
+                file.WriteLine("\tpublic class CompareValue_{0} : ICompareValue<{1}>", enumFullname.Replace(".", "_"), enumFullname);
+                file.WriteLine("\t{");
+                file.WriteLine("\t\tpublic override bool Equal({0} lhs, {0} rhs)", enumFullname);
+                file.WriteLine("\t\t{");
+                file.WriteLine("\t\t\treturn lhs == rhs;");
+                file.WriteLine("\t\t}");
+                file.WriteLine("\t\tpublic override bool NotEqual({0} lhs, {0} rhs)", enumFullname);
+                file.WriteLine("\t\t{");
+                file.WriteLine("\t\t\treturn lhs != rhs;");
+                file.WriteLine("\t\t}");
+                file.WriteLine("\t\tpublic override bool Greater({0} lhs, {0} rhs)", enumFullname);
+                file.WriteLine("\t\t{");
+                file.WriteLine("\t\t\treturn lhs > rhs;");
+                file.WriteLine("\t\t}");
+                file.WriteLine("\t\tpublic override bool GreaterEqual({0} lhs, {0} rhs)", enumFullname);
+                file.WriteLine("\t\t{");
+                file.WriteLine("\t\t\treturn lhs >= rhs;");
+                file.WriteLine("\t\t}");
+                file.WriteLine("\t\tpublic override bool Less({0} lhs, {0} rhs)", enumFullname);
+                file.WriteLine("\t\t{");
+                file.WriteLine("\t\t\treturn lhs < rhs;");
+                file.WriteLine("\t\t}");
+                file.WriteLine("\t\tpublic override bool LessEqual({0} lhs, {0} rhs)", enumFullname);
+                file.WriteLine("\t\t{");
+                file.WriteLine("\t\t\treturn lhs <= rhs;");
+                file.WriteLine("\t\t}");
+                file.WriteLine("\t}");
+                file.WriteLine();
+            }
+
+            foreach (CustomizedStruct structType in TypeManager.Instance.Structs)
+            {
+                string structFullname = structType.Name.Replace("::", ".");
+
+                file.WriteLine("\tpublic class CompareValue_{0} : ICompareValue<{1}>", structFullname.Replace(".", "_"), structFullname);
+                file.WriteLine("\t{");
+                file.WriteLine("\t\tpublic override bool Equal({0} lhs, {0} rhs)", structFullname);
+                file.WriteLine("\t\t{");
+
+                string compareStr = "";
+                foreach (PropertyDef member in structType.Properties)
+                {
+                    if (member.IsStatic)
+                    {
+                        continue;
+                    }
+
+                    if (!string.IsNullOrEmpty(compareStr))
+                    {
+                        compareStr += " && ";
+                    }
+
+                    if (member.Type != null && (member.Type.IsValueType || Plugin.IsStringType(member.Type)))
+                    {
+                        compareStr += string.Format("(lhs.{0} == rhs.{0})", member.BasicName);
+                    }
+                    else
+                    {
+                        string nativeMemberType = DataCsExporter.GetGeneratedNativeType(member.NativeType);
+                        compareStr += string.Format("OperationUtils.Compare<{0}>(lhs.{1}, rhs.{1}, EOperatorType.E_EQUAL)", nativeMemberType.Replace("::", "."), member.BasicName);
+                    }
+                }
+
+                if (string.IsNullOrEmpty(compareStr))
+                {
+                    file.WriteLine("\t\t\treturn lhs == rhs;");
+                }
+                else
+                {
+                    file.WriteLine("\t\t\treturn {0};", compareStr);
+                }
+
+                file.WriteLine("\t\t}");
+                file.WriteLine("\t\tpublic override bool NotEqual({0} lhs, {0} rhs)", structFullname);
+                file.WriteLine("\t\t{");
+                file.WriteLine("\t\t\treturn !Equal(lhs, rhs);");
+                file.WriteLine("\t\t}");
+                file.WriteLine("\t}");
+                file.WriteLine();
             }
         }
 

@@ -104,45 +104,63 @@ namespace Behaviac.Design.Nodes
             }
         }
 
-        public override bool ResetMembers(bool check, AgentType agentType, bool clear, MethodDef method = null, PropertyDef property = null)
+        public override bool ResetMembers(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
         {
             bool bReset = false;
 
             if (this.Method != null)
             {
-                if (clear || this.Method.ShouldBeCleared(agentType))
+                if (metaOperation == MetaOperations.ChangeAgentType || metaOperation == MetaOperations.RemoveAgentType)
                 {
-                    bReset = true;
-
-                    if (!check)
+                    if (this.Method.ShouldBeCleared(agentType))
                     {
                         this.Method = null;
+
+                        bReset = true;
+                    }
+                }
+                else if (metaOperation == MetaOperations.RemoveMethod)
+                {
+                    if (method != null && method.OldName == this.Method.Name)
+                    {
+                        this.Method = null;
+
+                        bReset = true;
                     }
                 }
                 else
                 {
-                    bReset |= this.Method.ResetMembers(check, agentType, clear, method, property);
+                    bReset |= this.Method.ResetMembers(metaOperation, agentType, method, property);
                 }
             }
 
             if (this.ResultFunctor != null)
             {
-                if (clear || this.Method.ShouldBeCleared(agentType))
+                if (metaOperation == MetaOperations.ChangeAgentType || metaOperation == MetaOperations.RemoveAgentType)
                 {
-                    bReset = true;
-
-                    if (!check)
+                    if (this.ResultFunctor.ShouldBeCleared(agentType))
                     {
                         this.ResultFunctor = null;
+
+                        bReset = true;
+                    }
+                }
+                else if (metaOperation == MetaOperations.RemoveMethod)
+                {
+                    if (method != null && method.OldName == this.ResultFunctor.Name)
+                    {
+                        this.ResultFunctor = null;
+
+                        bReset = true;
                     }
                 }
                 else
                 {
-                    bReset |= this.ResultFunctor.ResetMembers(check, agentType, clear, method, property);
+                    bReset |= this.ResultFunctor.ResetMembers(metaOperation, agentType, method, property);
                 }
             }
 
-            bReset |= base.ResetMembers(check, agentType, clear, method, property);
+            bReset |= base.ResetMembers(metaOperation, agentType, method, property);
 
             return bReset;
         }

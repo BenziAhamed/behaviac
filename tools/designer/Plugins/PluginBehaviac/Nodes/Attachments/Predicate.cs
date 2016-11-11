@@ -179,23 +179,23 @@ namespace PluginBehaviac.Events
             base.CheckForErrors(rootBehavior, result);
         }
 
-        public override bool ResetMembers(bool check, AgentType agentType, bool clear, MethodDef method = null, PropertyDef property = null)
+        public override bool ResetMembers(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
         {
             bool bReset = false;
 
             if (this.Opl != null)
             {
-                bReset |= this.Opl.ResetMembers(check, agentType, clear, method, property);
+                bReset |= this.Opl.ResetMembers(metaOperation, agentType, method, property);
             }
 
             if (this.Opr != null)
             {
-                bReset |= this.Opr.ResetMembers(check, agentType, clear, method, property);
+                bReset |= this.Opr.ResetMembers(metaOperation, agentType, method, property);
             }
 
-            bReset |= base.ResetMembers(check, agentType, clear, method, property);
+            bReset |= base.ResetMembers(metaOperation, agentType, method, property);
 
-            if (!check && bReset)
+            if (bReset && metaOperation != MetaOperations.CheckProperty && metaOperation != MetaOperations.CheckMethod)
             {
                 OnPropertyValueChanged(false);
             }

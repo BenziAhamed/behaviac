@@ -1,3 +1,7 @@
+2016-11-11  3.5.19
+    Fix GC bug for comparing the enum or struct.
+    Fix reset the behaviors bug when removing a method or task.
+
 2016-11-3  3.5.18
     Fix a bug for replacing the node on the Prefab.
     Do not export the SetVariable() for the assignment of the property.

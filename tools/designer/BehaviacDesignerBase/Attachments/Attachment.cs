@@ -277,7 +277,8 @@ namespace Behaviac.Design.Attachments
         public virtual void GetReferencedFiles(ref List<string> referencedFiles) {
         }
 
-        public virtual bool ResetMembers(bool check, AgentType agentType, bool clear, MethodDef method = null, PropertyDef property = null) {
+        public virtual bool ResetMembers(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
+        {
             return false;
         }
 

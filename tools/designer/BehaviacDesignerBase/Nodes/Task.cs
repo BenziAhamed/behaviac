@@ -214,23 +214,37 @@ namespace Behaviac.Design.Nodes
             base.CheckForErrors(rootBehavior, result);
         }
 
-        public override bool ResetMembers(bool check, AgentType agentType, bool clear, MethodDef method = null, PropertyDef property = null) {
+        public override bool ResetMembers(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
+        {
             bool bReset = false;
 
-            if (this._task != null && method != null && this._task.Name == method.OldName) {
-                if (method != null && this._task.Name == method.OldName &&
-                    (clear || this._task.ShouldBeCleared(agentType))) {
-                    bReset = true;
+            if (this._task != null)
+            {
+                if (metaOperation == MetaOperations.ChangeAgentType || metaOperation == MetaOperations.RemoveAgentType)
+                {
+                    if (this._task.ShouldBeCleared(agentType))
+                    {
+                        this._task = null;
 
-                    if (!check)
-                    { this._task = null; }
+                        bReset = true;
+                    }
+                }
+                else if (metaOperation == MetaOperations.RemoveMethod)
+                {
+                    if (method != null && method.OldName == this._task.Name)
+                    {
+                        this._task = null;
 
-                } else {
-                    bReset |= this._task.ResetMembers(check, agentType, clear, method, property);
+                        bReset = true;
+                    }
+                }
+                else
+                {
+                    bReset |= this._task.ResetMembers(metaOperation, agentType, method, property);
                 }
             }
 
-            bReset |= base.ResetMembers(check, agentType, clear, method, property);
+            bReset |= base.ResetMembers(metaOperation, agentType, method, property);
 
             return bReset;
         }

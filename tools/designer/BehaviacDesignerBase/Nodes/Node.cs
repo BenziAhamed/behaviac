@@ -1027,15 +1027,16 @@ namespace Behaviac.Design.Nodes
             }
         }
 
-        public virtual bool ResetMembers(bool check, AgentType agentType, bool clear, MethodDef method = null, PropertyDef property = null) {
+        public virtual bool ResetMembers(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
+        {
             bool bReset = false;
 
             foreach(Attachments.Attachment attach in this.Attachments) {
-                bReset |= attach.ResetMembers(check, agentType, clear, method, property);
+                bReset |= attach.ResetMembers(metaOperation, agentType, method, property);
             }
 
             foreach(Node child in this.GetChildNodes()) {
-                bReset |= child.ResetMembers(check, agentType, clear, method, property);
+                bReset |= child.ResetMembers(metaOperation, agentType, method, property);
             }
 
             return bReset;
