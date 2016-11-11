@@ -557,15 +557,19 @@ namespace Behaviac.Design
             // get the group for the prefab and clear it from the old ones.
             string prefabFolder = GetPrefabFolder();
 
-            if (Directory.Exists(prefabFolder))
+            if (!Directory.Exists(prefabFolder))
             {
-                TreeNode prefabTreeNode = GetPrefabGroup(treeView.Nodes, _prefabGroupName, prefabFolder);
-                TreeNodeCollection prefabs = prefabTreeNode.Nodes;
-                prefabs.Clear();
-
-                // build the prefab list
-                BuildBehaviorList(prefabs, prefabFolder, _fileManagers, false);
+                Directory.CreateDirectory(prefabFolder);
             }
+
+            Debug.Check(Directory.Exists(prefabFolder));
+
+            TreeNode prefabTreeNode = GetPrefabGroup(treeView.Nodes, _prefabGroupName, prefabFolder);
+            TreeNodeCollection prefabs = prefabTreeNode.Nodes;
+            prefabs.Clear();
+
+            // build the prefab list
+            BuildBehaviorList(prefabs, prefabFolder, _fileManagers, false);
 
             // expand the behaviors
             //treeView.ExpandAll();
