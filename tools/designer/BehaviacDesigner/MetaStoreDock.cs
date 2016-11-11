@@ -1263,7 +1263,7 @@ namespace Behaviac.Design
                 }
             }
 
-            return false;
+            return true;
         }
 
         private void resetMembersInWorkspace(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
