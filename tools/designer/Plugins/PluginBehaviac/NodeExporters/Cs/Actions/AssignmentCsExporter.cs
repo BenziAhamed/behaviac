@@ -40,7 +40,7 @@ namespace PluginBehaviac.NodeExporters
 
             if (assignment.Opr != null)
             {
-                RightValueCsExporter.GenerateClassConstructor(assignment.Opr, stream, indent, "opr");
+                RightValueCsExporter.GenerateClassConstructor(node, assignment.Opr, stream, indent, "opr");
             }
         }
 
@@ -76,14 +76,14 @@ namespace PluginBehaviac.NodeExporters
 
                 if (prop != null)
                 {
-                    RightValueCsExporter.GenerateCode(assignment.Opr, stream, indent + "\t\t\t", assignment.Opr.NativeType.Replace("::", "."), "opr", "opr");
+                    RightValueCsExporter.GenerateCode(node, assignment.Opr, stream, indent + "\t\t\t", assignment.Opr.NativeType.Replace("::", "."), "opr", "opr");
 
-                    string property = PropertyCsExporter.GetProperty(prop, assignment.Opl.ArrayIndexElement, stream, indent + "\t\t\t", "opl", "assignment");
+                    string property = PropertyCsExporter.GetProperty(node, prop, assignment.Opl.ArrayIndexElement, stream, indent + "\t\t\t", "opl", "assignment");
                     string propName = prop.BasicName.Replace("[]", "");
 
                     if (prop.IsArrayElement && assignment.Opl.ArrayIndexElement != null)
                     {
-                        ParameterCsExporter.GenerateCode(assignment.Opl.ArrayIndexElement, stream, indent + "\t\t\t", "int", "opl_index", "assignment_opl");
+                        ParameterCsExporter.GenerateCode(node, assignment.Opl.ArrayIndexElement, stream, indent + "\t\t\t", "int", "opl_index", "assignment_opl");
                         property = string.Format("({0})[opl_index]", property);
                     }
 
@@ -92,7 +92,7 @@ namespace PluginBehaviac.NodeExporters
                     {
                         if (assignment.Opr.Var != null && assignment.Opr.Var.ArrayIndexElement != null)
                         {
-                            ParameterCsExporter.GenerateCode(assignment.Opr.Var.ArrayIndexElement, stream, indent + "\t\t\t", "int", "opr_index", "assignment_opr");
+                            ParameterCsExporter.GenerateCode(node, assignment.Opr.Var.ArrayIndexElement, stream, indent + "\t\t\t", "int", "opr_index", "assignment_opr");
                             oprStr = string.Format("({0})[opr_index]", oprStr);
                         }
                     }

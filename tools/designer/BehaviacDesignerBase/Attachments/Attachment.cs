@@ -179,18 +179,12 @@ namespace Behaviac.Design.Attachments
             get { return null; }
         }
 
-        public void ResetId() {
-            bool bReset = (this.Id < 0);
-
-            if (!bReset) {
-                DefaultObject obj = Plugin.GetObjectById((Nodes.Node)Node.Behavior, this.Id);
-
-                if (obj != null && obj != this)
-                { bReset = true; }
+        public void ResetId()
+        {
+            if (this.Id < 0 || null != Plugin.GetPreviousObjectById((Nodes.Node)Node.Behavior, this.Id, this))
+            {
+                this.Id = Plugin.NewNodeId((Nodes.Node)Node.Behavior);
             }
-
-            if (bReset)
-            { this.Id = Plugin.NewNodeId((Nodes.Node)Node.Behavior); }
         }
 
         private void setLabel(string value, bool wasModified) {
@@ -283,7 +277,8 @@ namespace Behaviac.Design.Attachments
         public virtual void GetReferencedFiles(ref List<string> referencedFiles) {
         }
 
-        public virtual bool ResetMembers(bool check, AgentType agentType, bool clear, MethodDef method = null, PropertyDef property = null) {
+        public virtual bool ResetMembers(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
+        {
             return false;
         }
 

@@ -56,7 +56,7 @@ namespace PluginBehaviac.NodeExporters
                 stream.WriteLine("{0}\t\tpublic override string GetReferencedTree(Agent pAgent)", indent);
                 stream.WriteLine("{0}\t\t{{", indent);
 
-                string retStr = RightValueCsExporter.GenerateCode(pReferencedBehavior.ReferenceBehavior, stream, indent + "\t\t\t", string.Empty, string.Empty, "Behavior");
+                string retStr = RightValueCsExporter.GenerateCode(node, pReferencedBehavior.ReferenceBehavior, stream, indent + "\t\t\t", string.Empty, string.Empty, "Behavior");
 
                 bool bConst = false;
                 if (pReferencedBehavior.ReferenceBehavior.Var != null && pReferencedBehavior.ReferenceBehavior.Var.IsConst)

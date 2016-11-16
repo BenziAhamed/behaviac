@@ -131,7 +131,7 @@ namespace behaviac
 
         void btreferencetree(const char* relativePath);
 
-        void bteventtree(const char* relativePath, TriggerMode triggerMode);
+		void bteventtree(const char* relativePath, TriggerMode triggerMode, bool bStateStackPushed);
 
         /**
         reset the current bt, do nothing if there is no current bt
@@ -148,7 +148,7 @@ namespace behaviac
         /**
         to respond to event 'btEvent' to switch to the corresonding behavior tree
         */
-        void btonevent(const char* btEvent);
+		bool btonevent(const char* btEvent, bool bStateStackPushed);
         ///////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////
         int GetId() const
@@ -529,7 +529,7 @@ namespace behaviac
 
         EBTStatus btexec_();
 
-        void _btsetcurrent(const char* relativePath, TriggerMode triggerMode = TM_Transfer, bool bByEvent = false);
+		void _btsetcurrent(const char* relativePath, TriggerMode triggerMode = TM_Transfer, bool bByEvent = false, bool bStateStackPushed = false);
 
         void btunload_pars(const BehaviorTree* bt);
 
@@ -669,8 +669,10 @@ namespace behaviac
             BehaviorTreeTask*	bt;
             TriggerMode			triggerMode;
             bool				triggerByEvent;
+			bool				bStateStackPushed;
 
-            BehaviorTreeStackItem_t(BehaviorTreeTask* bt_, TriggerMode tm, bool bByEvent) : bt(bt_), triggerMode(tm), triggerByEvent(bByEvent)
+			BehaviorTreeStackItem_t(BehaviorTreeTask* bt_, TriggerMode tm, bool bByEvent, bool bStateStackPushed_) : 
+				bt(bt_), triggerMode(tm), triggerByEvent(bByEvent), bStateStackPushed(bStateStackPushed_)
             {
             }
         };

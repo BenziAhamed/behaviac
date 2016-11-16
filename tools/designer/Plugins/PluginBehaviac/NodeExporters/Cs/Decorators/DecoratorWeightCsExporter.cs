@@ -43,7 +43,7 @@ namespace PluginBehaviac.NodeExporters
                 stream.WriteLine("{0}\t\tprotected override int GetWeight(Agent pAgent)", indent);
                 stream.WriteLine("{0}\t\t{{", indent);
 
-                string retStr = VariableCsExporter.GenerateCode(decoratorWeight.Weight, false, stream, indent + "\t\t\t", string.Empty, string.Empty, string.Empty);
+                string retStr = VariableCsExporter.GenerateCode(node, decoratorWeight.Weight, false, stream, indent + "\t\t\t", string.Empty, string.Empty, string.Empty);
 
                 stream.WriteLine("{0}\t\t\treturn {1};", indent, retStr);
                 stream.WriteLine("{0}\t\t}}", indent);

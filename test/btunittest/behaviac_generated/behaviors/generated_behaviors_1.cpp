@@ -1585,7 +1585,7 @@ namespace behaviac
 			BEHAVIAC_UNUSED_VAR(pAgent);
 			BEHAVIAC_UNUSED_VAR(childStatus);
 			EBTStatus result = BT_SUCCESS;
-			Agent* pAgent_opr = Agent::GetInstance(pAgent, "par_child");
+			Agent* pAgent_opr = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_par_child, ChildNodeTest* >();
 			BEHAVIAC_ASSERT(pAgent_opr);
 			int opr = ((AgentNodeTest*)pAgent_opr)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_1, int >();
 			((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_0, int >() = opr;
@@ -1606,7 +1606,7 @@ namespace behaviac
 			BEHAVIAC_UNUSED_VAR(pAgent);
 			BEHAVIAC_UNUSED_VAR(childStatus);
 			int& opl = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_0, int >();
-			Agent* pAgent_opr = Agent::GetInstance(pAgent, "par_child");
+			Agent* pAgent_opr = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_par_child, ChildNodeTest* >();
 			BEHAVIAC_ASSERT(pAgent_opr);
 			int& opr = ((AgentNodeTest*)pAgent_opr)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_1, int >();
 			bool op = Details::Equal(opl, opr);
@@ -1627,7 +1627,7 @@ namespace behaviac
 			BEHAVIAC_UNUSED_VAR(pAgent);
 			BEHAVIAC_UNUSED_VAR(childStatus);
 			EBTStatus result = BT_SUCCESS;
-			Agent* pAgent_opr = Agent::GetInstance(pAgent, "par_child");
+			Agent* pAgent_opr = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_par_child, ChildNodeTest* >();
 			BEHAVIAC_ASSERT(pAgent_opr);
 			int opr = ((AgentNodeTest*)pAgent_opr)->_Execute_Method_<METHOD_TYPE_AgentNodeTest_getConstOne, int >();
 			((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_0, int >() = opr;
@@ -1666,7 +1666,7 @@ namespace behaviac
 		{
 			BEHAVIAC_UNUSED_VAR(pAgent);
 			BEHAVIAC_UNUSED_VAR(childStatus);
-			Agent* pAgent_opl = Agent::GetInstance(pAgent, "par_child");
+			Agent* pAgent_opl = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_par_child, ChildNodeTest* >();
 			BEHAVIAC_ASSERT(pAgent_opl);
 			float& opl = ((AgentNodeTest*)pAgent_opl)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_2, float >();
 			float& opr = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_testVar_3, float >();
@@ -1687,7 +1687,7 @@ namespace behaviac
 		{
 			BEHAVIAC_UNUSED_VAR(pAgent);
 			BEHAVIAC_UNUSED_VAR(childStatus);
-			Agent* pAgent_method = Agent::GetInstance(pAgent, "par_child");
+			Agent* pAgent_method = ((AgentNodeTest*)pAgent)->_Get_Property_<PROPERTY_TYPE_AgentNodeTest_par_child, ChildNodeTest* >();
 			BEHAVIAC_ASSERT(pAgent_method);
 			((AgentNodeTest*)pAgent_method)->_Execute_Method_<METHOD_TYPE_AgentNodeTest_SelectTarget, void >();
 			return BT_SUCCESS;
@@ -2750,6 +2750,25 @@ namespace behaviac
 		}
 	};
 
+	class Action_bt_node_test_action_ut_2_node11 : public Action
+	{
+	public:
+		BEHAVIAC_DECLARE_DYNAMIC_TYPE(Action_bt_node_test_action_ut_2_node11, Action);
+		Action_bt_node_test_action_ut_2_node11()
+		{
+			method_p0 = (char*)("Hello\" \t \n Kitty!");
+		}
+	protected:
+		virtual EBTStatus update_impl(Agent* pAgent, EBTStatus childStatus)
+		{
+			BEHAVIAC_UNUSED_VAR(pAgent);
+			BEHAVIAC_UNUSED_VAR(childStatus);
+			((AgentNodeTest*)pAgent)->_Execute_Method_<METHOD_TYPE_AgentNodeTest_testString, void, behaviac::string >(method_p0);
+			return BT_SUCCESS;
+		}
+		behaviac::string method_p0;
+	};
+
 		bool bt_node_test_action_ut_2::Create(BehaviorTree* pBT)
 		{
 			pBT->SetClassNameString("BehaviorTree");
@@ -2871,6 +2890,16 @@ namespace behaviac
 #endif
 					node0->AddChild(node5);
 					node0->SetHasEvents(node0->HasEvents() | node5->HasEvents());
+				}
+				{
+					Action_bt_node_test_action_ut_2_node11* node11 = BEHAVIAC_NEW Action_bt_node_test_action_ut_2_node11;
+					node11->SetClassNameString("Action");
+					node11->SetId(11);
+#if !BEHAVIAC_RELEASE
+					node11->SetAgentType("AgentNodeTest");
+#endif
+					node0->AddChild(node11);
+					node0->SetHasEvents(node0->HasEvents() | node11->HasEvents());
 				}
 				pBT->SetHasEvents(pBT->HasEvents() | node0->HasEvents());
 			}

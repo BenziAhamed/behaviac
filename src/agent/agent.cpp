@@ -742,7 +742,7 @@ namespace behaviac
 
     bool IsValidPath(const char* relativePath);
 
-    void Agent::_btsetcurrent(const char* relativePath, TriggerMode triggerMode, bool bByEvent)
+	void Agent::_btsetcurrent(const char* relativePath, TriggerMode triggerMode, bool bByEvent, bool bStateStackPushed)
     {
         bool bEmptyPath = (!relativePath || *relativePath == '\0');
         BEHAVIAC_ASSERT(bEmptyPath || behaviac::StringUtils::FindExtension(relativePath) == 0);
@@ -777,7 +777,7 @@ namespace behaviac
                     //'oldBt' will be restored when the new triggered one ends
                     if (triggerMode == TM_Return)
                     {
-                        BehaviorTreeStackItem_t item(this->m_currentBT, triggerMode, bByEvent);
+						BehaviorTreeStackItem_t item(this->m_currentBT, triggerMode, bByEvent, bStateStackPushed);
                         BEHAVIAC_ASSERT(this->m_btStack.size() < 200, "recursive?");
                         this->m_btStack.push_back(item);
                     }
@@ -856,9 +856,9 @@ namespace behaviac
         this->_btsetcurrent(relativePath, TM_Return, false);
     }
 
-    void Agent::bteventtree(const char* relativePath, TriggerMode triggerMode)
+	void Agent::bteventtree(const char* relativePath, TriggerMode triggerMode, bool bStateStackPushed)
     {
-        this->_btsetcurrent(relativePath, triggerMode, true);
+		this->_btsetcurrent(relativePath, triggerMode, true, bStateStackPushed);
     }
 
     void Agent::btresetcurrent()
@@ -903,6 +903,10 @@ namespace behaviac
                         }
 						else {
 							bExecCurrent = true;
+
+							if (lastOne.bStateStackPushed) {
+								this->m_variables.PopTop();
+							}
 						}
                     }
 					else {
@@ -988,7 +992,7 @@ namespace behaviac
         return BT_INVALID;
     }
 
-    void Agent::btonevent(const char* btEvent)
+	bool Agent::btonevent(const char* btEvent, bool bStateStackPushed)
     {
         if (this->m_currentBT)
         {
@@ -996,8 +1000,14 @@ namespace behaviac
 			BEHAVIAC_ASSERT(this->m_debug_in_exec == 0, "FireEvent should not be called during the Agent is in btexec");
 #endif
 
-            this->m_currentBT->onevent(this, btEvent);
+			bool bFired = false;
+			bool bGoOn = this->m_currentBT->onevent(this, btEvent, bStateStackPushed, bFired);
+			BEHAVIAC_UNUSED_VAR(bGoOn);
+
+			return bFired;
         }
+
+		return false;
     }
 
     BehaviorTreeTask* Agent::btgetcurrent()
@@ -1203,7 +1213,7 @@ namespace behaviac
             {
                 CNamedEvent* pEvent = it->second;
 
-                pEvent->SetFired(pAgent, false);
+                pEvent->SetFired(pAgent, false, 0);
 
                 return;
             }
@@ -1214,7 +1224,7 @@ namespace behaviac
 
 			if (pEvent)
 			{
-				pEvent->SetFired(pAgent, false);
+				pEvent->SetFired(pAgent, false, 0);
 			}
         }
     }

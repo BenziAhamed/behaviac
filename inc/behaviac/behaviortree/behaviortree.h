@@ -211,7 +211,7 @@ namespace behaviac
         void Clear();
         bool CheckPreconditions(const Agent* pAgent, bool bIsAlive) const;
         virtual void ApplyEffects(Agent* pAgent, BehaviorNode::EPhase phase) const;
-        bool CheckEvents(const char* eventName, Agent* pAgent) const;
+		bool CheckEvents(const char* eventName, Agent* pAgent, bool bStateStackPushed, bool& bFired) const;
         virtual void Attach(BehaviorNode* pAttachment, bool bIsPrecondition, bool bIsEffector, bool bIsTransition);
         void Attach(BehaviorNode* pAttachment, bool bIsPrecondition, bool bIsEffector);
 

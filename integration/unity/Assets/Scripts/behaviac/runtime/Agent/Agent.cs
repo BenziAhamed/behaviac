@@ -1295,8 +1295,6 @@ namespace behaviac
 
         protected static void Init_(int contextId, Agent pAgent, int priority)
         {
-            Workspace.Instance.RegisterStuff();
-
             Debug.Check(contextId >= 0, "invalid context id");
 
             pAgent.m_contextId = contextId;

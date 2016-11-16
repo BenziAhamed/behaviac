@@ -15,12 +15,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using Behaviac.Design;
 
 namespace PluginBehaviac.DataExporters
 {
     public class ArrayCppExporter
     {
-        public static void GenerateCode(object obj, StreamWriter stream, string indent, string itemTypename, string var)
+        public static void GenerateCode(object obj, DefaultObject defaultObj, StreamWriter stream, string indent, string itemTypename, string var)
         {
             if (obj != null)
             {
@@ -38,7 +39,7 @@ namespace PluginBehaviac.DataExporters
                         {
                             string itemName = string.Format("{0}_item{1}", var.Replace(".", "_"), i);
 
-                            DataCppExporter.GenerateCode(list[i], stream, indent, itemTypename, itemName, string.Empty);
+                            DataCppExporter.GenerateCode(list[i], defaultObj, stream, indent, itemTypename, itemName, string.Empty);
 
                             stream.WriteLine("{0}{1}.push_back({2});", indent, var, itemName);
                         }

@@ -6,6 +6,275 @@ using System.Collections.Generic;
 
 namespace behaviac
 {
+	public class CompareValue_EnumTest : ICompareValue<EnumTest>
+	{
+		public override bool Equal(EnumTest lhs, EnumTest rhs)
+		{
+			return lhs == rhs;
+		}
+		public override bool NotEqual(EnumTest lhs, EnumTest rhs)
+		{
+			return lhs != rhs;
+		}
+		public override bool Greater(EnumTest lhs, EnumTest rhs)
+		{
+			return lhs > rhs;
+		}
+		public override bool GreaterEqual(EnumTest lhs, EnumTest rhs)
+		{
+			return lhs >= rhs;
+		}
+		public override bool Less(EnumTest lhs, EnumTest rhs)
+		{
+			return lhs < rhs;
+		}
+		public override bool LessEqual(EnumTest lhs, EnumTest rhs)
+		{
+			return lhs <= rhs;
+		}
+	}
+
+	public class CompareValue_ETest : ICompareValue<ETest>
+	{
+		public override bool Equal(ETest lhs, ETest rhs)
+		{
+			return lhs == rhs;
+		}
+		public override bool NotEqual(ETest lhs, ETest rhs)
+		{
+			return lhs != rhs;
+		}
+		public override bool Greater(ETest lhs, ETest rhs)
+		{
+			return lhs > rhs;
+		}
+		public override bool GreaterEqual(ETest lhs, ETest rhs)
+		{
+			return lhs >= rhs;
+		}
+		public override bool Less(ETest lhs, ETest rhs)
+		{
+			return lhs < rhs;
+		}
+		public override bool LessEqual(ETest lhs, ETest rhs)
+		{
+			return lhs <= rhs;
+		}
+	}
+
+	public class CompareValue_FSMAgentTest_EMessage : ICompareValue<FSMAgentTest.EMessage>
+	{
+		public override bool Equal(FSMAgentTest.EMessage lhs, FSMAgentTest.EMessage rhs)
+		{
+			return lhs == rhs;
+		}
+		public override bool NotEqual(FSMAgentTest.EMessage lhs, FSMAgentTest.EMessage rhs)
+		{
+			return lhs != rhs;
+		}
+		public override bool Greater(FSMAgentTest.EMessage lhs, FSMAgentTest.EMessage rhs)
+		{
+			return lhs > rhs;
+		}
+		public override bool GreaterEqual(FSMAgentTest.EMessage lhs, FSMAgentTest.EMessage rhs)
+		{
+			return lhs >= rhs;
+		}
+		public override bool Less(FSMAgentTest.EMessage lhs, FSMAgentTest.EMessage rhs)
+		{
+			return lhs < rhs;
+		}
+		public override bool LessEqual(FSMAgentTest.EMessage lhs, FSMAgentTest.EMessage rhs)
+		{
+			return lhs <= rhs;
+		}
+	}
+
+	public class CompareValue_TNS_NE_NAT_eColor : ICompareValue<TNS.NE.NAT.eColor>
+	{
+		public override bool Equal(TNS.NE.NAT.eColor lhs, TNS.NE.NAT.eColor rhs)
+		{
+			return lhs == rhs;
+		}
+		public override bool NotEqual(TNS.NE.NAT.eColor lhs, TNS.NE.NAT.eColor rhs)
+		{
+			return lhs != rhs;
+		}
+		public override bool Greater(TNS.NE.NAT.eColor lhs, TNS.NE.NAT.eColor rhs)
+		{
+			return lhs > rhs;
+		}
+		public override bool GreaterEqual(TNS.NE.NAT.eColor lhs, TNS.NE.NAT.eColor rhs)
+		{
+			return lhs >= rhs;
+		}
+		public override bool Less(TNS.NE.NAT.eColor lhs, TNS.NE.NAT.eColor rhs)
+		{
+			return lhs < rhs;
+		}
+		public override bool LessEqual(TNS.NE.NAT.eColor lhs, TNS.NE.NAT.eColor rhs)
+		{
+			return lhs <= rhs;
+		}
+	}
+
+	public class CompareValue_Act : ICompareValue<Act>
+	{
+		public override bool Equal(Act lhs, Act rhs)
+		{
+			return (lhs.Var_B_Loop == rhs.Var_B_Loop) && OperationUtils.Compare<List<EnumTest>>(lhs.Var_List_EnumTest, rhs.Var_List_EnumTest, EOperatorType.E_EQUAL);
+		}
+		public override bool NotEqual(Act lhs, Act rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_UnityEngine_GameObject : ICompareValue<UnityEngine.GameObject>
+	{
+		public override bool Equal(UnityEngine.GameObject lhs, UnityEngine.GameObject rhs)
+		{
+			return lhs == rhs;
+		}
+		public override bool NotEqual(UnityEngine.GameObject lhs, UnityEngine.GameObject rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_TestNS_Node : ICompareValue<TestNS.Node>
+	{
+		public override bool Equal(TestNS.Node lhs, TestNS.Node rhs)
+		{
+			return lhs == rhs;
+		}
+		public override bool NotEqual(TestNS.Node lhs, TestNS.Node rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_TestNS_Float2 : ICompareValue<TestNS.Float2>
+	{
+		public override bool Equal(TestNS.Float2 lhs, TestNS.Float2 rhs)
+		{
+			return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+		}
+		public override bool NotEqual(TestNS.Float2 lhs, TestNS.Float2 rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_TestClassA : ICompareValue<TestClassA>
+	{
+		public override bool Equal(TestClassA lhs, TestClassA rhs)
+		{
+			return lhs == rhs;
+		}
+		public override bool NotEqual(TestClassA lhs, TestClassA rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_BSASN_TransitPlan : ICompareValue<BSASN.TransitPlan>
+	{
+		public override bool Equal(BSASN.TransitPlan lhs, BSASN.TransitPlan rhs)
+		{
+			return (lhs.plan_ID == rhs.plan_ID) && (lhs.plan_selection_precedence == rhs.plan_selection_precedence) && OperationUtils.Compare<List<BSASN.SpatialCoord>>(lhs.transit_points, rhs.transit_points, EOperatorType.E_EQUAL);
+		}
+		public override bool NotEqual(BSASN.TransitPlan lhs, BSASN.TransitPlan rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_BSASN_SpatialCoord : ICompareValue<BSASN.SpatialCoord>
+	{
+		public override bool Equal(BSASN.SpatialCoord lhs, BSASN.SpatialCoord rhs)
+		{
+			return (lhs.coordX == rhs.coordX) && (lhs.coordY == rhs.coordY);
+		}
+		public override bool NotEqual(BSASN.SpatialCoord lhs, BSASN.SpatialCoord rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_UnityEngine_Vector3 : ICompareValue<UnityEngine.Vector3>
+	{
+		public override bool Equal(UnityEngine.Vector3 lhs, UnityEngine.Vector3 rhs)
+		{
+			return (lhs.x == rhs.x) && (lhs.y == rhs.y) && (lhs.z == rhs.z);
+		}
+		public override bool NotEqual(UnityEngine.Vector3 lhs, UnityEngine.Vector3 rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_TestNamespace_Float2 : ICompareValue<TestNamespace.Float2>
+	{
+		public override bool Equal(TestNamespace.Float2 lhs, TestNamespace.Float2 rhs)
+		{
+			return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+		}
+		public override bool NotEqual(TestNamespace.Float2 lhs, TestNamespace.Float2 rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_TestNamespace_ClassAsValueType : ICompareValue<TestNamespace.ClassAsValueType>
+	{
+		public override bool Equal(TestNamespace.ClassAsValueType lhs, TestNamespace.ClassAsValueType rhs)
+		{
+			return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+		}
+		public override bool NotEqual(TestNamespace.ClassAsValueType lhs, TestNamespace.ClassAsValueType rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_TNS_ST_PER_WRK_kEmployee : ICompareValue<TNS.ST.PER.WRK.kEmployee>
+	{
+		public override bool Equal(TNS.ST.PER.WRK.kEmployee lhs, TNS.ST.PER.WRK.kEmployee rhs)
+		{
+			return (lhs.id == rhs.id) && (lhs.name == rhs.name) && (lhs.code == rhs.code) && (lhs.weight == rhs.weight) && (lhs.isMale == rhs.isMale) && OperationUtils.Compare<TNS.NE.NAT.eColor>(lhs.skinColor, rhs.skinColor, EOperatorType.E_EQUAL) && OperationUtils.Compare<TNS.ST.kCar>(lhs.car, rhs.car, EOperatorType.E_EQUAL) && OperationUtils.Compare<behaviac.Agent>(lhs.boss, rhs.boss, EOperatorType.E_EQUAL);
+		}
+		public override bool NotEqual(TNS.ST.PER.WRK.kEmployee lhs, TNS.ST.PER.WRK.kEmployee rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_TNS_ST_kCar : ICompareValue<TNS.ST.kCar>
+	{
+		public override bool Equal(TNS.ST.kCar lhs, TNS.ST.kCar rhs)
+		{
+			return (lhs.brand == rhs.brand) && (lhs.price == rhs.price) && OperationUtils.Compare<TNS.NE.NAT.eColor>(lhs.color, rhs.color, EOperatorType.E_EQUAL);
+		}
+		public override bool NotEqual(TNS.ST.kCar lhs, TNS.ST.kCar rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_StructTest : ICompareValue<StructTest>
+	{
+		public override bool Equal(StructTest lhs, StructTest rhs)
+		{
+			return (lhs.a == rhs.a);
+		}
+		public override bool NotEqual(StructTest lhs, StructTest rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+
 	partial class AgentMeta
 	{
 		private class CMethod_behaviac_Agent_VectorAdd : CAgentMethodVoidBase
@@ -1924,6 +2193,7 @@ namespace behaviac
 			meta.RegisterMethod(4293156620, new CAgentMethod<TestClassA>(delegate(Agent self) { return ((AgentNodeTest)self).TestFunC(); }));
 			meta.RegisterMethod(336877113, new CMethod_AgentNodeTest_TestFuncD());
 			meta.RegisterMethod(3054404812, new CMethod_AgentNodeTest_testGameObject());
+			meta.RegisterMethod(3286992291, new CAgentMethodVoid<string>(delegate(Agent self, string param0) { AgentMetaVisitor.ExecuteMethod(self, "testString", new object[]{ param0 }); }));
 			meta.RegisterMethod(2247836416, new CAgentMethodVoid<List<TestNS.Float2>>(delegate(Agent self, List<TestNS.Float2> param0) { AgentMetaVisitor.ExecuteMethod(self, "testVectorStruct", new object[]{ param0 }); }));
 			meta.RegisterMethod(2469406928, new CAgentMethodVoid<BSASN.TransitPlan, EnumTest, string>(delegate(Agent self, BSASN.TransitPlan param0, EnumTest param1, string param2) { AgentMetaVisitor.ExecuteMethod(self, "transitPlanTactics", new object[]{ param0, param1, param2 }); }));
 			meta.RegisterMethod(1045109914, new CAgentStaticMethodVoid<string>(delegate(string param0) { AgentNodeTest.LogMessage(param0); }));
@@ -2011,6 +2281,7 @@ namespace behaviac
 			meta.RegisterMethod(4293156620, new CAgentMethod<TestClassA>(delegate(Agent self) { return ((ChildNodeTest)self).TestFunC(); }));
 			meta.RegisterMethod(336877113, new CMethod_AgentNodeTest_TestFuncD());
 			meta.RegisterMethod(3054404812, new CMethod_AgentNodeTest_testGameObject());
+			meta.RegisterMethod(3286992291, new CAgentMethodVoid<string>(delegate(Agent self, string param0) { AgentMetaVisitor.ExecuteMethod(self, "testString", new object[]{ param0 }); }));
 			meta.RegisterMethod(2247836416, new CAgentMethodVoid<List<TestNS.Float2>>(delegate(Agent self, List<TestNS.Float2> param0) { AgentMetaVisitor.ExecuteMethod(self, "testVectorStruct", new object[]{ param0 }); }));
 			meta.RegisterMethod(2469406928, new CAgentMethodVoid<BSASN.TransitPlan, EnumTest, string>(delegate(Agent self, BSASN.TransitPlan param0, EnumTest param1, string param2) { AgentMetaVisitor.ExecuteMethod(self, "transitPlanTactics", new object[]{ param0, param1, param2 }); }));
 			meta.RegisterMethod(1045109914, new CAgentStaticMethodVoid<string>(delegate(string param0) { ChildNodeTest.LogMessage(param0); }));
@@ -2092,6 +2363,7 @@ namespace behaviac
 			meta.RegisterMethod(4293156620, new CAgentMethod<TestClassA>(delegate(Agent self) { return ((ChildNodeTestSub)self).TestFunC(); }));
 			meta.RegisterMethod(336877113, new CMethod_AgentNodeTest_TestFuncD());
 			meta.RegisterMethod(3054404812, new CMethod_AgentNodeTest_testGameObject());
+			meta.RegisterMethod(3286992291, new CAgentMethodVoid<string>(delegate(Agent self, string param0) { AgentMetaVisitor.ExecuteMethod(self, "testString", new object[]{ param0 }); }));
 			meta.RegisterMethod(2247836416, new CAgentMethodVoid<List<TestNS.Float2>>(delegate(Agent self, List<TestNS.Float2> param0) { AgentMetaVisitor.ExecuteMethod(self, "testVectorStruct", new object[]{ param0 }); }));
 			meta.RegisterMethod(2469406928, new CAgentMethodVoid<BSASN.TransitPlan, EnumTest, string>(delegate(Agent self, BSASN.TransitPlan param0, EnumTest param1, string param2) { AgentMetaVisitor.ExecuteMethod(self, "transitPlanTactics", new object[]{ param0, param1, param2 }); }));
 			meta.RegisterMethod(1045109914, new CAgentStaticMethodVoid<string>(delegate(string param0) { ChildNodeTestSub.LogMessage(param0); }));
@@ -2650,6 +2922,23 @@ namespace behaviac
 			AgentMeta.Register<UnityEngine.GameObject>("UnityEngine.GameObject");
 			AgentMeta.Register<UnityEngine.Vector3>("UnityEngine.Vector3");
 
+			ComparerRegister.RegisterType<EnumTest, CompareValue_EnumTest>();
+			ComparerRegister.RegisterType<ETest, CompareValue_ETest>();
+			ComparerRegister.RegisterType<FSMAgentTest.EMessage, CompareValue_FSMAgentTest_EMessage>();
+			ComparerRegister.RegisterType<TNS.NE.NAT.eColor, CompareValue_TNS_NE_NAT_eColor>();
+			ComparerRegister.RegisterType<Act, CompareValue_Act>();
+			ComparerRegister.RegisterType<UnityEngine.GameObject, CompareValue_UnityEngine_GameObject>();
+			ComparerRegister.RegisterType<TestNS.Node, CompareValue_TestNS_Node>();
+			ComparerRegister.RegisterType<TestNS.Float2, CompareValue_TestNS_Float2>();
+			ComparerRegister.RegisterType<TestClassA, CompareValue_TestClassA>();
+			ComparerRegister.RegisterType<BSASN.TransitPlan, CompareValue_BSASN_TransitPlan>();
+			ComparerRegister.RegisterType<BSASN.SpatialCoord, CompareValue_BSASN_SpatialCoord>();
+			ComparerRegister.RegisterType<UnityEngine.Vector3, CompareValue_UnityEngine_Vector3>();
+			ComparerRegister.RegisterType<TestNamespace.Float2, CompareValue_TestNamespace_Float2>();
+			ComparerRegister.RegisterType<TestNamespace.ClassAsValueType, CompareValue_TestNamespace_ClassAsValueType>();
+			ComparerRegister.RegisterType<TNS.ST.PER.WRK.kEmployee, CompareValue_TNS_ST_PER_WRK_kEmployee>();
+			ComparerRegister.RegisterType<TNS.ST.kCar, CompareValue_TNS_ST_kCar>();
+			ComparerRegister.RegisterType<StructTest, CompareValue_StructTest>();
 		}
 
 		static partial void unRegisterMeta()

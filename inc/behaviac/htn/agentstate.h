@@ -68,7 +68,6 @@ namespace behaviac
         template<typename VariableType>
         const VariableType* Get(const Agent* pAgent, bool bMemberGet, const behaviac::CMemberBase* pMember, uint32_t varId) const;
 
-    private:
         void PopTop();
     };
 }

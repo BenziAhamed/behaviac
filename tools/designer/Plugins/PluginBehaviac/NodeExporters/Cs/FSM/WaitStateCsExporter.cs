@@ -41,7 +41,7 @@ namespace PluginBehaviac.NodeExporters
 
             if (waitState.Time != null)
             {
-                RightValueCsExporter.GenerateClassConstructor(waitState.Time, stream, indent, "Time");
+                RightValueCsExporter.GenerateClassConstructor(node, waitState.Time, stream, indent, "Time");
             }
         }
 
@@ -72,7 +72,7 @@ namespace PluginBehaviac.NodeExporters
                 stream.WriteLine("{0}\t\tprotected override double GetTime(Agent pAgent)", indent);
                 stream.WriteLine("{0}\t\t{{", indent);
 
-                string retStr = RightValueCppExporter.GenerateCode(waitState.Time, stream, indent + "\t\t\t", string.Empty, string.Empty, "Time");
+                string retStr = RightValueCppExporter.GenerateCode(node, waitState.Time, stream, indent + "\t\t\t", string.Empty, string.Empty, "Time");
 
                 if (!waitState.Time.IsPublic && (waitState.Time.IsMethod || waitState.Time.Var != null && waitState.Time.Var.IsProperty))
                 {

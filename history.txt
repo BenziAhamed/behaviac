@@ -1,3 +1,26 @@
+2016-11-11  3.5.19
+    Fix GC bug for comparing the enum or struct.
+    Fix reset the behaviors bug when removing a method or task.
+
+2016-11-3  3.5.18
+    Fix a bug for replacing the node on the Prefab.
+    Do not export the SetVariable() for the assignment of the property.
+    Add the filename for the loading error.
+    Fix a bug for setting the ID.
+
+2016-10-21  3.5.17
+    Fix a bug for setting the agent of the Assignment node and Precondition attachment.
+
+2016-10-17  3.5.16
+    Fix a bug for selecting the agent type.
+    Fix a bug for setting the parameters of the method for the Effector.
+
+2016-09-26  3.5.15
+    Fix a bug for checking the Selector node.
+    Fix a bug for the type exported path.
+    Fix a bug for the string value with space.
+    Fix a bug for the default value of the ExportFileCount.
+
 2016-09-20  3.5.14
     Support splitting the generated_behaviors.cpp file.
     Add the BEHAVIAC_CS_ONLY to use the behaviac lib without UnityEngine.

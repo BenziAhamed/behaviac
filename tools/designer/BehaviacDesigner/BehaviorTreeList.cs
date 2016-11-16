@@ -557,15 +557,19 @@ namespace Behaviac.Design
             // get the group for the prefab and clear it from the old ones.
             string prefabFolder = GetPrefabFolder();
 
-            if (Directory.Exists(prefabFolder))
+            if (!Directory.Exists(prefabFolder))
             {
-                TreeNode prefabTreeNode = GetPrefabGroup(treeView.Nodes, _prefabGroupName, prefabFolder);
-                TreeNodeCollection prefabs = prefabTreeNode.Nodes;
-                prefabs.Clear();
-
-                // build the prefab list
-                BuildBehaviorList(prefabs, prefabFolder, _fileManagers, false);
+                Directory.CreateDirectory(prefabFolder);
             }
+
+            Debug.Check(Directory.Exists(prefabFolder));
+
+            TreeNode prefabTreeNode = GetPrefabGroup(treeView.Nodes, _prefabGroupName, prefabFolder);
+            TreeNodeCollection prefabs = prefabTreeNode.Nodes;
+            prefabs.Clear();
+
+            // build the prefab list
+            BuildBehaviorList(prefabs, prefabFolder, _fileManagers, false);
 
             // expand the behaviors
             //treeView.ExpandAll();
@@ -842,11 +846,11 @@ namespace Behaviac.Design
                             {
                                 UndoManager.Save(behavior);
                             }
-
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.Message, Resources.LoadError, MessageBoxButtons.OK);
+                            string errorInfo = string.Format("{0}\n{1}", filename, ex.Message);
+                            MessageBox.Show(errorInfo, Resources.LoadError, MessageBoxButtons.OK);
                         }
 
                         break;
@@ -2331,13 +2335,19 @@ namespace Behaviac.Design
                         return false;
                     }
 
-                    if (!string.IsNullOrEmpty(Workspace.Current.Language) && Workspace.Current.Language != "cpp" && !Workspace.Current.IsSetExportFolder(Workspace.Current.Language))
+                    if (!Workspace.Current.IsSetExportFolder(Workspace.Current.Language))
                     {
                         if (DialogResult.OK == MessageBox.Show(Resources.InvalidExportedTypePath, Resources.ExportError, MessageBoxButtons.OK))
                         {
-                            MetaStoreDock.Inspect(null);
+                            using (EditWorkspaceDialog wksDialog = new EditWorkspaceDialog())
+                            {
+                                wksDialog.EditWorkspace(Workspace.Current);
 
-                            return false;
+                                if (wksDialog.ShowDialog() == DialogResult.Cancel)
+                                {
+                                    return false;
+                                }
+                            }
                         }
                     }
                 }
@@ -2907,8 +2917,7 @@ namespace Behaviac.Design
                 {
                     try
                     {
-                        SaveBehavior(node, false);
-
+                        SaveBehavior(node, false, false);
                     }
                     catch (Exception ex)
                     {
@@ -2924,8 +2933,7 @@ namespace Behaviac.Design
                 {
                     try
                     {
-                        SaveBehavior(node, false);
-
+                        SaveBehavior(node, false, false);
                     }
                     catch (Exception ex)
                     {

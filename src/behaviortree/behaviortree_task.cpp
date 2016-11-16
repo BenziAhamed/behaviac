@@ -911,9 +911,9 @@ namespace behaviac
     //     }
     // }
 
-    bool BehaviorTask::CheckEvents(const char* eventName, Agent* pAgent) const
+	bool BehaviorTask::CheckEvents(const char* eventName, Agent* pAgent, bool bStateStackPushed, bool& bFired) const
     {
-        return this->m_node->CheckEvents(eventName, pAgent);
+		return this->m_node->CheckEvents(eventName, pAgent, bStateStackPushed, bFired);
     }
 
     void BehaviorTask::copyto(BehaviorTask* target) const
@@ -1723,11 +1723,11 @@ namespace behaviac
         return s;
     }
 
-    bool BehaviorTask::onevent(Agent* pAgent, const char* eventName)
+	bool BehaviorTask::onevent(Agent* pAgent, const char* eventName, bool bStateStackPushed, bool& bFired)
     {
         if (this->m_status == BT_RUNNING && this->m_node->m_bHasEvents)
         {
-            if (!this->CheckEvents(eventName, pAgent))
+			if (!this->CheckEvents(eventName, pAgent, bStateStackPushed, bFired))
             {
                 return false;
             }
@@ -1741,7 +1741,7 @@ namespace behaviac
         super::Init(node);
     }
 
-    bool BranchTask::oneventCurrentNode(Agent* pAgent, const char* eventName)
+	bool BranchTask::oneventCurrentNode(Agent* pAgent, const char* eventName, bool bStateStackPushed, bool& bFired)
     {
         BEHAVIAC_ASSERT(this->m_currentTask);
 
@@ -1750,7 +1750,7 @@ namespace behaviac
 
         BEHAVIAC_ASSERT(s == BT_RUNNING && this->m_node->HasEvents());
 
-        bool bGoOn = this->m_currentTask->onevent(pAgent, eventName);
+		bool bGoOn = this->m_currentTask->onevent(pAgent, eventName, bStateStackPushed, bFired);
 
         //give the handling back to parents
 		if (bGoOn && this->m_currentTask)
@@ -1762,7 +1762,7 @@ namespace behaviac
             {
                 BEHAVIAC_ASSERT(parentBranch->GetStatus() == BT_RUNNING);
 
-                bGoOn = parentBranch->onevent(pAgent, eventName);
+				bGoOn = parentBranch->onevent(pAgent, eventName, bStateStackPushed, bFired);
 
                 if (!bGoOn)
                 {
@@ -1776,7 +1776,7 @@ namespace behaviac
         return bGoOn;
     }
 
-    bool BranchTask::onevent(Agent* pAgent, const char* eventName)
+	bool BranchTask::onevent(Agent* pAgent, const char* eventName, bool bStateStackPushed, bool& bFired)
     {
         if (this->m_node->HasEvents())
         {
@@ -1784,28 +1784,30 @@ namespace behaviac
 
             if (this->m_currentTask)
             {
-                bGoOn = this->oneventCurrentNode(pAgent, eventName);
+				bGoOn = this->oneventCurrentNode(pAgent, eventName, bStateStackPushed, bFired);
             }
 
 			if (bGoOn)
 			{
-				bGoOn = super::onevent(pAgent, eventName);
+				bGoOn = super::onevent(pAgent, eventName, bStateStackPushed, bFired);
 			}
+
+			return bGoOn;
         }
 
         return true;
     }
 
-    bool LeafTask::onevent(Agent* pAgent, const char* eventName)
+	bool LeafTask::onevent(Agent* pAgent, const char* eventName, bool bStateStackPushed, bool& bFired)
     {
-        bool bGoOn = super::onevent(pAgent, eventName);
+		bool bGoOn = super::onevent(pAgent, eventName, bStateStackPushed, bFired);
 
         return bGoOn;
     }
 
-    bool BehaviorTreeTask::onevent(Agent* pAgent, const char* eventName)
+    bool BehaviorTreeTask::onevent(Agent* pAgent, const char* eventName, bool bStateStackPushed, bool& bFired)
     {
-		return super::onevent(pAgent, eventName);
+		return super::onevent(pAgent, eventName, bStateStackPushed, bFired);
     }
 
     void BehaviorTreeTask::Save(ISerializableNode* node) const

@@ -250,12 +250,12 @@ namespace behaviac
         super::Init(node);
     }
 
-	bool ReferencedBehaviorTask::onevent(Agent* pAgent, const char* eventName)
+	bool ReferencedBehaviorTask::onevent(Agent* pAgent, const char* eventName, bool bStateStackPushed, bool& bFired)
 	{
 		if (this->m_status == BT_RUNNING && this->m_node->HasEvents())
         {
 			BEHAVIAC_ASSERT(this->m_subTree);
-            if (!this->m_subTree->onevent(pAgent, eventName))
+			if (!this->m_subTree->onevent(pAgent, eventName, bStateStackPushed, bFired))
             {
                 return false;
             }

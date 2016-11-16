@@ -116,16 +116,16 @@ namespace PluginBehaviac.Nodes
             base.CheckForErrors(rootBehavior, result);
         }
 
-        public override bool ResetMembers(bool check, AgentType agentType, bool clear, MethodDef method = null, PropertyDef property = null)
+        public override bool ResetMembers(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
         {
             bool bReset = false;
 
             if (this._time != null)
             {
-                bReset |= this._time.ResetMembers(check, agentType, clear, method, property);
+                bReset |= this._time.ResetMembers(metaOperation, agentType, method, property);
             }
 
-            bReset |= base.ResetMembers(check, agentType, clear, method, property);
+            bReset |= base.ResetMembers(metaOperation, agentType, method, property);
 
             return bReset;
         }

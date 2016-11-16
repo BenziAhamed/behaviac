@@ -111,7 +111,7 @@ namespace behaviac
         return m_triggerMode;
     }
 
-    void Event::switchTo(Agent* pAgent)
+	bool Event::switchTo(Agent* pAgent, bool bStateStackPushed)
     {
         if (!StringUtils::IsNullOrEmpty(this->m_referencedBehaviorPath.c_str()))
         {
@@ -119,10 +119,14 @@ namespace behaviac
             {
                 TriggerMode tm = this->GetTriggerMode();
 
-                pAgent->bteventtree(this->m_referencedBehaviorPath.c_str(), tm);
+				pAgent->bteventtree(this->m_referencedBehaviorPath.c_str(), tm, bStateStackPushed);
                 pAgent->btexec();
+
+				return true;
             }
         }
+
+		return false;
     }
 
     BehaviorTask* Event::createTask() const
@@ -205,7 +209,7 @@ namespace behaviac
             {
                 TriggerMode tm = this->GetTriggerMode();
 
-                pAgent->bteventtree(pEventNode->m_referencedBehaviorPath.c_str(), tm);
+                pAgent->bteventtree(pEventNode->m_referencedBehaviorPath.c_str(), tm, false);
                 EBTStatus s = pAgent->btexec();
                 BEHAVIAC_UNUSED_VAR(s);
             }

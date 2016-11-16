@@ -22,7 +22,7 @@ namespace PluginBehaviac.DataExporters
 {
     public class VariableCppExporter
     {
-        public static void GenerateClassConstructor(Behaviac.Design.VariableDef variable, StreamWriter stream, string indent, string var)
+        public static void GenerateClassConstructor(DefaultObject defaultObj, Behaviac.Design.VariableDef variable, StreamWriter stream, string indent, string var)
         {
             if (variable.ValueClass == Behaviac.Design.VariableDef.kConst)
             {
@@ -41,16 +41,16 @@ namespace PluginBehaviac.DataExporters
                         int endIndex = nativeType.LastIndexOf('>');
                         string itemType = nativeType.Substring(startIndex + 1, endIndex - startIndex - 1);
 
-                        ArrayCppExporter.GenerateCode(variable.Value, stream, indent + "\t\t\t", itemType, var);
+                        ArrayCppExporter.GenerateCode(variable.Value, defaultObj, stream, indent + "\t\t\t", itemType, var);
                     }
                     else if (Plugin.IsCustomClassType(type))
                     {
-                        StructCppExporter.GenerateCode(variable.Value, stream, indent + "\t\t\t", var, null, "");
+                        StructCppExporter.GenerateCode(variable.Value, defaultObj, stream, indent + "\t\t\t", var, null, "");
                     }
                     else if ((Plugin.IsStringType(type) && !variable.IsConst))
                     {
                         string nativeType = DataCppExporter.GetBasicGeneratedNativeType(variable.NativeType);
-                        string retStr = DataCppExporter.GenerateCode(variable.Value, stream, indent + "\t\t\t", nativeType, string.Empty, string.Empty);
+                        string retStr = DataCppExporter.GenerateCode(variable.Value, defaultObj, stream, indent + "\t\t\t", nativeType, string.Empty, string.Empty);
                         stream.WriteLine("{0}\t\t\t{1} = {2};", indent, var, retStr);
                     }
                 }
@@ -77,7 +77,7 @@ namespace PluginBehaviac.DataExporters
             }
         }
 
-        public static string GenerateCode(Behaviac.Design.VariableDef variable, bool isRefParam, StreamWriter stream, string indent, string typename, string var, string caller)
+        public static string GenerateCode(DefaultObject defaultObj, Behaviac.Design.VariableDef variable, bool isRefParam, StreamWriter stream, string indent, string typename, string var, string caller)
         {
             string retStr = string.Empty;
 
@@ -93,12 +93,12 @@ namespace PluginBehaviac.DataExporters
 
                 if (shouldGenerate)
                 {
-                    retStr = DataCppExporter.GenerateCode(variable.Value, stream, indent, typename, var, caller);
+                    retStr = DataCppExporter.GenerateCode(variable.Value, defaultObj, stream, indent, typename, var, caller);
                 }
             }
             else if (variable.Property != null)
             {
-                retStr = PropertyCppExporter.GenerateCode(variable.Property, variable.ArrayIndexElement, isRefParam, stream, indent, typename, var, caller);
+                retStr = PropertyCppExporter.GenerateCode(defaultObj, variable.Property, variable.ArrayIndexElement, isRefParam, stream, indent, typename, var, caller);
             }
 
             return retStr;

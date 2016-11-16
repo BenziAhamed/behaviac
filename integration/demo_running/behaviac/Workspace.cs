@@ -1890,7 +1890,7 @@ namespace behaviac
 
             if (field != null)
             {
-                return field.IsPublic;
+                return field.IsPublic || field.IsAssembly;
             }
 
             PropertyInfo f = m as PropertyInfo;
@@ -1898,7 +1898,7 @@ namespace behaviac
 
             if (getter != null)
             {
-                return getter.IsPublic;
+                return getter.IsPublic || getter.IsAssembly;
             }
             else
             {
@@ -1906,7 +1906,7 @@ namespace behaviac
 
                 if (setter != null)
                 {
-                    return setter.IsPublic;
+                    return setter.IsPublic || setter.IsAssembly;
                 }
             }
 
@@ -2454,7 +2454,7 @@ namespace behaviac
                 xmlWriter.WriteAttributeString("Static", "true");
             }
 
-            if (m.IsPublic)
+            if (m.IsPublic || m.IsAssembly)
             {
                 xmlWriter.WriteAttributeString("Public", "true");
             }
@@ -2920,6 +2920,11 @@ namespace behaviac
         {
             agentTypes.Sort(delegate(TypeInfo_t x, TypeInfo_t y)
             {
+                if (x == y || x.type == y.type)
+                {
+                    return 0;
+                }
+
                 if (x.type == typeof(behaviac.Agent))
                 {
                     return -1;

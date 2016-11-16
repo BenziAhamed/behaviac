@@ -15,13 +15,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using Behaviac.Design;
 using Behaviac.Design.Attributes;
 
 namespace PluginBehaviac.DataExporters
 {
     public class ParameterCppExporter
     {
-        public static string GenerateCode(Behaviac.Design.MethodDef.Param param, StreamWriter stream, string indent, string typename, string var, string caller)
+        public static string GenerateCode(DefaultObject defaultObj, Behaviac.Design.MethodDef.Param param, StreamWriter stream, string indent, string typename, string var, string caller)
         {
             Behaviac.Design.ParInfo par = param.Value as Behaviac.Design.ParInfo;
             if (par != null)
@@ -29,9 +30,9 @@ namespace PluginBehaviac.DataExporters
 
             Behaviac.Design.VariableDef v = param.Value as Behaviac.Design.VariableDef;
             if (v != null)
-                return VariableCppExporter.GenerateCode(v, param.IsRef, stream, indent, typename, var, caller);
+                return VariableCppExporter.GenerateCode(defaultObj, v, param.IsRef, stream, indent, typename, var, caller);
 
-            return DataCppExporter.GenerateCode(param.Value, stream, indent, typename, var, caller);
+            return DataCppExporter.GenerateCode(param.Value, defaultObj, stream, indent, typename, var, caller);
         }
 
         public static void PostGenerateCode(Behaviac.Design.MethodDef.Param param, StreamWriter stream, string indent, string typename, string var, string caller, object parent)

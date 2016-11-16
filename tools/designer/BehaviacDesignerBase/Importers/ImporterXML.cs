@@ -427,8 +427,6 @@ namespace Behaviac.Design.Importers
                     }
                 }
 
-                Plugin.AllMetaTypes.Clear();
-
                 if (typesNodes.Count > 0)
                 {
                     wrtr.WriteLine("namespace XMLPluginBehaviac");
@@ -511,7 +509,7 @@ namespace Behaviac.Design.Importers
                     {
                         XmlNode agentNode = agentsNodes[i];
                         string classfullname = getAgentClassFullName(agentNode);
-                        string className = HandleBaseName(classfullname);
+                        string className = HandleBasicName(classfullname);
 
                         Plugin.AllMetaTypes.Add(classfullname);
 
@@ -556,7 +554,7 @@ namespace Behaviac.Design.Importers
                         wrtr.WriteLine("\tpublic class {0} : {1}", HandleHierarchyName(classfullname), (baseName == "Agent") ? "Behaviac.Design.Agent" : HandleHierarchyName(baseName));
                         wrtr.WriteLine("\t{");
                         {
-                            writeMembers(agentNode, className, wrtr, false);
+                            writeMembers(agentNode, className, wrtr, null);
                             wrtr.WriteLine("");
                             writeMethods(agentNode, className, wrtr);
                         }
@@ -656,7 +654,7 @@ namespace Behaviac.Design.Importers
             return Plugin.GetTypeName(typeName);
         }
 
-        private static string HandleBaseName(string fullname)
+        private static string HandleBasicName(string fullname)
         {
             if (!string.IsNullOrEmpty(fullname))
             {
@@ -746,6 +744,15 @@ namespace Behaviac.Design.Importers
 
                 nodeDict.Add(className, rootNode);
 
+                string displayName = GetAttribute(rootNode, "DisplayName");
+                string desc = GetAttribute(rootNode, "Desc");
+
+                CustomizedStruct structType = new CustomizedStruct(typeNode.Value, displayName, desc);
+                if (typeNode.Value != "System.Object" && typeNode.Value != "System::Object")
+                {
+                    TypeManager.Instance.Structs.Add(structType);
+                }
+
                 writeTypeHandler(className, wrtr);
 
                 XmlNode isRefTypeNode = rootNode.Attributes["IsRefType"];
@@ -756,7 +763,7 @@ namespace Behaviac.Design.Importers
                 wrtr.WriteLine("\tpublic class {0}", className);
                 wrtr.WriteLine("\t{");
 
-                writeMembers(rootNode, className, wrtr, true);
+                writeMembers(rootNode, className, wrtr, structType);
 
                 wrtr.WriteLine("\t}");
                 wrtr.WriteLine("");
@@ -844,6 +851,9 @@ namespace Behaviac.Design.Importers
                 XmlNode descNode = rootNode.Attributes["Desc"];
                 string desc = (descNode != null && descNode.Value.Length > 0) ? descNode.Value : displayName;
 
+                CustomizedEnum enumType = new CustomizedEnum(typeNode.Value, displayName, desc);
+                TypeManager.Instance.Enums.Add(enumType);
+
                 wrtr.WriteLine("\t[Behaviac.Design.EnumDesc(\"{0}\", \"{1}\", \"{2}\")]", typeNode.Value, displayName, desc);
                 wrtr.WriteLine("\tpublic enum {0}", enumName);
                 wrtr.WriteLine("\t{");
@@ -861,6 +871,25 @@ namespace Behaviac.Design.Importers
 
                     descNode = childNode.Attributes["Desc"];
                     desc = (descNode != null && descNode.Value.Length > 0) ? descNode.Value : displayName;
+
+                    string memberValue = GetAttribute(childNode, "MemberValue");
+
+                    CustomizedEnum.CustomizedEnumMember enumMember = new CustomizedEnum.CustomizedEnumMember(null);
+                    enumMember.Name = HandleBasicName(valueName);
+                    enumMember.Namespace = enumType.Namespace;
+                    enumMember.DisplayName = displayName;
+                    enumMember.Description = desc;
+
+                    try
+                    {
+                        enumMember.Value = int.Parse(memberValue);
+                    }
+                    catch
+                    {
+                        enumMember.Value = -1;
+                    }
+
+                    enumType.Members.Add(enumMember);
 
                     wrtr.WriteLine("\t\t[Behaviac.Design.EnumMemberDesc(\"{0}\", \"{1}\", \"{2}\")]", nativeValueName, displayName, desc);
                     wrtr.WriteLine("\t\t{0},\n", valueName);
@@ -905,7 +934,7 @@ namespace Behaviac.Design.Importers
             return string.Format("[{0}(\"{1}\", \"{2}\", \"Property\", DesignerProperty.DisplayMode.NoDisplay, {3}, {4})]", designerType, displayName, desc, index, designerFlags);
         }
 
-        private static void writeMembers(XmlNode rootNode, string myClassName, StreamWriter wrtr, bool isStruct)
+        private static void writeMembers(XmlNode rootNode, string myClassName, StreamWriter wrtr, CustomizedStruct structType)
         {
             int index = 0;
             foreach (XmlNode childNode in rootNode.ChildNodes)
@@ -949,7 +978,7 @@ namespace Behaviac.Design.Importers
 
                     memberType = fixTypeName(memberType);
 
-                    if (isStruct)
+                    if (structType != null)
                     {
                         Type type = Plugin.GetTypeFromName(memberType);
                         string defaultValue = string.Empty;
@@ -970,6 +999,14 @@ namespace Behaviac.Design.Importers
 
                         string staticStr = (isStatic == "true") ? "static " : "";
 
+                        PropertyDef prop = new PropertyDef(null, type, myClassName, memberName, displayName, desc);
+                        prop.IsStatic = (isStatic == "true");
+                        if (string.IsNullOrEmpty(prop.NativeType))
+                        {
+                            prop.NativeType = memberOriginalType;
+                        }
+                        structType.Properties.Add(prop);
+
                         wrtr.WriteLine("\t\t{0}private {1} _{2}{3};", staticStr, memberType, memberName, defaultValue);
                         wrtr.WriteLine("\t\t{0}", getStructAttribute(displayName, desc, memberType, index, isReadOnly != "false"));
                         wrtr.WriteLine("\t\t{0}public {1} {2}", staticStr, memberType, memberName);
@@ -984,7 +1021,6 @@ namespace Behaviac.Design.Importers
                         wrtr.WriteLine("\t\t}");
 
                         index++;
-
                     }
                     else
                     {
@@ -1006,7 +1042,7 @@ namespace Behaviac.Design.Importers
             }
 
             // Add the ToString() method for the struct.
-            if (isStruct)
+            if (structType != null)
             {
                 wrtr.WriteLine("\t\tpublic override string ToString()");
                 wrtr.WriteLine("\t\t{");

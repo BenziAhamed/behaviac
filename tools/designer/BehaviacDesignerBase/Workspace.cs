@@ -271,7 +271,7 @@ namespace Behaviac.Design
                 return data.ExportFileCount;
             }
 
-            return -1;
+            return 1;
         }
 
         public bool IsSetExportFolder(string format)
@@ -747,6 +747,10 @@ namespace Behaviac.Design
             _agentsXMLNode = null;
             _typesXMLNode = null;
 
+            Plugin.AllMetaTypes.Clear();
+            TypeManager.Instance.Enums.Clear();
+            TypeManager.Instance.Structs.Clear();
+
             string bbPath = ws.getBlackboardPath();
 
             if (string.IsNullOrEmpty(bbPath) || !File.Exists(bbPath))
@@ -785,7 +789,8 @@ namespace Behaviac.Design
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, Resources.LoadError, MessageBoxButtons.OK);
+                string errorInfo = string.Format("{0}\n{1}", bbPath, e.Message);
+                MessageBox.Show(errorInfo, Resources.LoadError, MessageBoxButtons.OK);
 
                 bbfile.RemoveAll();
             }

@@ -39,7 +39,7 @@ namespace PluginBehaviac.NodeExporters
 
             if (action.Method != null)
             {
-                MethodCppExporter.GenerateClassConstructor(action.Method, stream, indent, "method");
+                MethodCppExporter.GenerateClassConstructor(node, action.Method, stream, indent, "method");
             }
         }
 
@@ -73,7 +73,7 @@ namespace PluginBehaviac.NodeExporters
             string resultStatus = "BT_SUCCESS";
             if (action.Method != null)
             {
-                string method = MethodCppExporter.GenerateCode(action.Method, stream, indent + "\t\t\t", string.Empty, string.Empty, "method");
+                string method = MethodCppExporter.GenerateCode(node, action.Method, stream, indent + "\t\t\t", string.Empty, string.Empty, "method");
 
                 if ("behaviac::EBTStatus" == action.Method.NativeReturnType)
                 {
@@ -103,7 +103,7 @@ namespace PluginBehaviac.NodeExporters
                     {
                         if ("void" == action.Method.NativeReturnType)
                         {
-                            resultStatus = MethodCppExporter.GenerateCode(action.ResultFunctor, stream, indent + "\t\t\t", string.Empty, string.Empty, "functor");
+                            resultStatus = MethodCppExporter.GenerateCode(node, action.ResultFunctor, stream, indent + "\t\t\t", string.Empty, string.Empty, "functor");
                         }
                         else
                         {

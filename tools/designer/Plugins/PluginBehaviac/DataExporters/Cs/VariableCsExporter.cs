@@ -15,13 +15,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using Behaviac.Design;
 using Behaviac.Design.Attributes;
 
 namespace PluginBehaviac.DataExporters
 {
     public class VariableCsExporter
     {
-        public static void GenerateClassConstructor(Behaviac.Design.VariableDef variable, StreamWriter stream, string indent, string var)
+        public static void GenerateClassConstructor(DefaultObject defaultObj, VariableDef variable, StreamWriter stream, string indent, string var)
         {
             if (variable.ValueClass == Behaviac.Design.VariableDef.kConst)
             {
@@ -35,17 +36,17 @@ namespace PluginBehaviac.DataExporters
                         int endIndex = nativeType.LastIndexOf('>');
                         string itemType = nativeType.Substring(startIndex + 1, endIndex - startIndex - 1);
 
-                        ArrayCsExporter.GenerateCode(variable.Value, stream, indent + "\t\t\t", itemType, var);
+                        ArrayCsExporter.GenerateCode(variable.Value, defaultObj, stream, indent + "\t\t\t", itemType, var);
                     }
                     else if (Plugin.IsCustomClassType(type))
                     {
                         string nativeType = DataCsExporter.GetGeneratedNativeType(variable.NativeType);
-                        StructCsExporter.GenerateCode(variable.Value, stream, indent + "\t\t\t", var, nativeType, null, "");
+                        StructCsExporter.GenerateCode(variable.Value, defaultObj, stream, indent + "\t\t\t", var, nativeType, null, "");
                     }
                     else if ((Plugin.IsStringType(type) && !variable.IsConst))
                     {
                         string nativeType = DataCsExporter.GetGeneratedNativeType(variable.NativeType);
-                        string retStr = DataCsExporter.GenerateCode(variable.Value, stream, indent + "\t\t\t", nativeType, string.Empty, string.Empty);
+                        string retStr = DataCsExporter.GenerateCode(variable.Value, defaultObj, stream, indent + "\t\t\t", nativeType, string.Empty, string.Empty);
                         stream.WriteLine("{0}\t\t\t{1} = {2};", indent, var, retStr);
                     }
                 }
@@ -83,7 +84,7 @@ namespace PluginBehaviac.DataExporters
             }
         }
 
-        public static string GenerateCode(Behaviac.Design.VariableDef variable, bool isRefParam, StreamWriter stream, string indent, string typename, string var, string caller, string setValue = null)
+        public static string GenerateCode(DefaultObject defaultObj, VariableDef variable, bool isRefParam, StreamWriter stream, string indent, string typename, string var, string caller, string setValue = null)
         {
             string retStr = string.Empty;
 
@@ -98,12 +99,12 @@ namespace PluginBehaviac.DataExporters
 
                 if (shouldGenerate)
                 {
-                    retStr = DataCsExporter.GenerateCode(variable.Value, stream, indent, typename, var, caller, setValue);
+                    retStr = DataCsExporter.GenerateCode(variable.Value, defaultObj, stream, indent, typename, var, caller, setValue);
                 }
             }
             else if (variable.Property != null)
             {
-                retStr = PropertyCsExporter.GenerateCode(variable.Property, variable.ArrayIndexElement, isRefParam, stream, indent, typename, var, caller, setValue);
+                retStr = PropertyCsExporter.GenerateCode(defaultObj, variable.Property, variable.ArrayIndexElement, isRefParam, stream, indent, typename, var, caller, setValue);
             }
 
             return retStr;

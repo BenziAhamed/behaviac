@@ -331,7 +331,8 @@ namespace Behaviac.Design.Nodes
             get { return "http://www.behaviac.com/language/zh/subtree/"; }
         }
 
-        public override bool ResetMembers(bool check, AgentType agentType, bool clear, MethodDef method = null, PropertyDef property = null) {
+        public override bool ResetMembers(MetaOperations metaOperation, AgentType agentType, MethodDef method, PropertyDef property)
+        {
             // This function should be empty here, so don't remove it.
             return false;
         }

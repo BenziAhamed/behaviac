@@ -484,7 +484,8 @@ namespace Behaviac.Design.FileManagers
                         }
 
                     } catch (Exception e) {
-                        MessageBox.Show(e.Message, Resources.LoadError, MessageBoxButtons.OK);
+                        string errorInfo = string.Format("{0}\n{1}", _filename, e.Message);
+                        MessageBox.Show(errorInfo, Resources.LoadError, MessageBoxButtons.OK);
                     }
                 }
             }
@@ -544,7 +545,8 @@ namespace Behaviac.Design.FileManagers
                 }
 
             } catch (Exception e) {
-                MessageBox.Show(e.Message, Resources.LoadError, MessageBoxButtons.OK);
+                string errorInfo = string.Format("{0}\n{1}", _filename, e.Message);
+                MessageBox.Show(errorInfo, Resources.LoadError, MessageBoxButtons.OK);
 
                 _xmlfile.RemoveAll();
 

@@ -487,6 +487,18 @@ namespace Behaviac.Design
         Break
     }
 
+    public enum MetaOperations
+    {
+        ChangeAgentType,
+        RemoveAgentType,
+        CheckProperty,
+        ChangeProperty,
+        RemoveProperty,
+        CheckMethod,
+        ChangeMethod,
+        RemoveMethod,
+    }
+
     public struct ObjectPair
     {
         public ObjectPair(Nodes.Node root, DefaultObject obj)

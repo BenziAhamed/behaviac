@@ -22,7 +22,7 @@ namespace PluginBehaviac.DataExporters
 {
     public class StructCsExporter
     {
-        public static void GenerateCode(object obj, StreamWriter stream, string indent, string var, string typename, object parent, string paramName)
+        public static void GenerateCode(object obj, DefaultObject defaultObj, StreamWriter stream, string indent, string var, string typename, object parent, string paramName)
         {
             Debug.Check(obj != null);
 
@@ -52,14 +52,14 @@ namespace PluginBehaviac.DataExporters
                         int endIndex = nativeTypeStr.LastIndexOf('>');
                         string itemType = nativeTypeStr.Substring(startIndex + 1, endIndex - startIndex - 1);
 
-                        ArrayCsExporter.GenerateCode(member, stream, indent, itemType, var + "." + property.Property.Name);
+                        ArrayCsExporter.GenerateCode(member, defaultObj, stream, indent, itemType, var + "." + property.Property.Name);
                     }
                     else
                     {
                         if (property.Attribute is DesignerStruct)
                         {
                             string memberTypeStr = DataCsExporter.GetGeneratedNativeType(member.GetType());
-                            GenerateCode(member, stream, indent, var + "." + property.Property.Name, memberTypeStr, parent, paramName);
+                            GenerateCode(member, defaultObj, stream, indent, var + "." + property.Property.Name, memberTypeStr, parent, paramName);
                         }
                         else
                         {
@@ -70,13 +70,13 @@ namespace PluginBehaviac.DataExporters
                                 if (param != null)
                                 {
                                     bStructProperty = true;
-                                    ParameterCsExporter.GenerateCode(param, stream, indent, string.Empty, var + "." + property.Property.Name, string.Empty);
+                                    ParameterCsExporter.GenerateCode(defaultObj, param, stream, indent, string.Empty, var + "." + property.Property.Name, string.Empty);
                                 }
                             }
 
                             if (!bStructProperty)
                             {
-                                DataCsExporter.GenerateCode(member, stream, indent, string.Empty, var + "." + property.Property.Name, string.Empty);
+                                DataCsExporter.GenerateCode(member, defaultObj, stream, indent, string.Empty, var + "." + property.Property.Name, string.Empty);
                             }
                         }
                     }

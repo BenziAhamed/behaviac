@@ -541,62 +541,6 @@ namespace Behaviac.Design
         /// </summary>
         private enum NodeAttachMode { None, Left, Right, Top, Bottom, Attachment, Center };
 
-        private bool replaceNode(Node node, Node newnode) {
-            if (node == null || !node.IsFSM && node.ParentConnector == null || newnode == null) {
-                return false;
-            }
-
-            bool replaced = (node.Children.Count == 0);
-
-            if (!replaced && newnode.CanAdoptChildren(node)) {
-                foreach(Node.Connector connector in node.Connectors) {
-                    Node.Connector newConnector = newnode.GetConnector(connector.Identifier);
-
-                    if (newConnector != null) {
-                        for (int i = 0; i < connector.ChildCount; ++i) {
-                            replaced |= newnode.AddChild(newConnector, (Node)connector.GetChild(i));
-                        }
-
-                        connector.ClearChildrenInternal();
-                    }
-                }
-            }
-
-            if (replaced)
-            {
-                Node parentNode = (Node)node.Parent;
-
-                if (node.IsFSM)
-                {
-                    Debug.Check(newnode.IsFSM);
-
-                    parentNode.RemoveFSMNode(node);
-                    parentNode.AddFSMNode(newnode);
-
-                    newnode.ScreenLocation = node.ScreenLocation;
-                }
-                else
-                {
-                    Node.Connector parentConnector = node.ParentConnector;
-                    Debug.Check(parentConnector != null);
-
-                    int index = parentConnector.GetChildIndex(node);
-                    Debug.Check(index >= 0);
-
-                    parentNode.RemoveChild(parentConnector, node);
-                    parentNode.AddChild(parentConnector, newnode, index);
-                }
-
-                foreach (Attachments.Attachment attach in node.Attachments)
-                {
-                    if (attach != null && newnode.AcceptsAttachment(attach))
-                        newnode.AddAttachment(attach);
-                }
-            }
-
-            return replaced;
-        }
-
         //return true if rootBehavior's agent type is derived from the agent type of childBehavior.
         public static bool IsCompatibleAgentType(Behavior rootBehavior, Behavior childBehavior) {
             if (rootBehavior != null && childBehavior != null && rootBehavior.AgentType != null && childBehavior.AgentType != null) {
@@ -840,7 +784,8 @@ namespace Behaviac.Design
 
                     // the node will replace the target node
                 case NodeAttachMode.Center:
-                    if (node != null && replaceNode(node, newnode)) {
+                    if (node != null && newnode != null && newnode.ReplaceNode(node))
+                    {
                         // automatically select the new node
                         _selectedNodePending = newnode;
                         _selectedNodePendingParent = nvd.Parent;
@@ -1896,7 +1841,8 @@ namespace Behaviac.Design
 
                             // the node will replace the target node
                         case (NodeAttachMode.Center):
-                            if (replaceNode(_dragTargetNode.Node, sourceNode)) {
+                            if (sourceNode != null && sourceNode.ReplaceNode(_dragTargetNode.Node))
+                            {
                                 LayoutChanged();
                             }
 
@@ -1932,7 +1878,7 @@ namespace Behaviac.Design
                                     }
 
                                     // reset its properties and methods
-                                    sourceNode.ResetMembers(false, this.RootNode.AgentType, true);
+                                    sourceNode.ResetMembers(MetaOperations.ChangeAgentType, this.RootNode.AgentType, null, null);
 
                                 } catch {
                                 }

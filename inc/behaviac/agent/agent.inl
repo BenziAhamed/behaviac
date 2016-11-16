@@ -33,7 +33,7 @@ namespace behaviac
 
             if (a)
             {
-                BEHAVIAC_ASSERT(TAGENT::DynamicCast(a) != 0);
+                BEHAVIAC_ASSERT(TAGENT::DynamicCast(a) != 0, "the same agentInstanceName is duplicated, please specify a unique name!");
                 pA = (TAGENT*)a;
             }
             else
@@ -236,7 +236,7 @@ namespace behaviac
 
             if (pEvent)
             {
-                pEvent->SetFired(pAgent, true);
+                pEvent->SetFired(pAgent, true, 0);
             }
             else
             {
@@ -270,7 +270,11 @@ namespace behaviac
                     BEHAVIAC_ASSERT(0, "unregistered parameters %s", eventName);
                 }
 
-                pEvent->SetFired(pAgent, true);
+                bool bFired = pEvent->SetFired(pAgent, true, 1);
+				if (!bFired)
+				{
+					pAgent->m_variables.PopTop();
+				}
             }
             else
             {
@@ -304,7 +308,11 @@ namespace behaviac
                     BEHAVIAC_ASSERT(0, "unregistered parameters %s", eventName);
                 }
 
-                pEvent->SetFired(pAgent, true);
+				bool bFired = pEvent->SetFired(pAgent, true, 2);
+				if (!bFired)
+				{
+					pAgent->m_variables.PopTop();
+				}
             }
             else
             {
@@ -338,7 +346,11 @@ namespace behaviac
                     BEHAVIAC_ASSERT(0, "unregistered parameters %s", eventName);
                 }
 
-                pEvent->SetFired(pAgent, true);
+				bool bFired = pEvent->SetFired(pAgent, true, 3);
+				if (!bFired)
+				{
+					pAgent->m_variables.PopTop();
+				}
             }
             else
             {

@@ -37,18 +37,18 @@ namespace PluginBehaviac.NodeExporters
             if (attach == null)
                 return;
 
-            RightValueCppExporter.GenerateClassConstructor(attach.Opl, stream, indent, "opl");
+            RightValueCppExporter.GenerateClassConstructor(attachment, attach.Opl, stream, indent, "opl");
 
             if (!attach.IsAction())
             {
                 if (attach.IsCompute() && attach.Opr1 != null)
                 {
-                    RightValueCppExporter.GenerateClassConstructor(attach.Opr1, stream, indent, "opr1");
+                    RightValueCppExporter.GenerateClassConstructor(attachment, attach.Opr1, stream, indent, "opr1");
                 }
 
                 if (attach.Opr2 != null)
                 {
-                    RightValueCppExporter.GenerateClassConstructor(attach.Opr2, stream, indent, "opr2");
+                    RightValueCppExporter.GenerateClassConstructor(attachment, attach.Opr2, stream, indent, "opr2");
                 }
             }
         }
@@ -91,7 +91,7 @@ namespace PluginBehaviac.NodeExporters
 
             if (attach.IsAction())
             {
-                string method = MethodCppExporter.GenerateCode(attach.Opl.Method, stream, indent + "\t\t\t", string.Empty, string.Empty, "opl");
+                string method = MethodCppExporter.GenerateCode(attachment, attach.Opl.Method, stream, indent + "\t\t\t", string.Empty, string.Empty, "opl");
 
                 stream.WriteLine("{0}\t\t\t{1};", indent, method);
                 MethodCppExporter.PostGenerateCode(attach.Opl.Method, stream, indent + "\t\t\t", string.Empty, string.Empty, "opl");
@@ -103,20 +103,20 @@ namespace PluginBehaviac.NodeExporters
                     PropertyDef prop = attach.Opl.Var.Property;
                     if (prop != null)
                     {
-                        RightValueCppExporter.GenerateCode(attach.Opr2, stream, indent + "\t\t\t", attach.Opr2.NativeType, "opr2", "opr2");
+                        RightValueCppExporter.GenerateCode(attachment, attach.Opr2, stream, indent + "\t\t\t", attach.Opr2.NativeType, "opr2", "opr2");
 
-                        string property = PropertyCppExporter.GetProperty(prop, attach.Opl.Var.ArrayIndexElement, stream, indent + "\t\t\t", "opl", "attach");
+                        string property = PropertyCppExporter.GetProperty(attachment, prop, attach.Opl.Var.ArrayIndexElement, stream, indent + "\t\t\t", "opl", "attach");
                         string propName = prop.BasicName.Replace("[]", "");
 
                         if (prop.IsArrayElement && attach.Opl.Var.ArrayIndexElement != null)
                         {
-                            ParameterCppExporter.GenerateCode(attach.Opl.Var.ArrayIndexElement, stream, indent + "\t\t\t", "int", "opl_index", "attach_opl");
+                            ParameterCppExporter.GenerateCode(attachment, attach.Opl.Var.ArrayIndexElement, stream, indent + "\t\t\t", "int", "opl_index", "attach_opl");
                             property = string.Format("({0})[opl_index]", property);
                         }
 
-                        string propBasicName = prop.BasicName.Replace("[]", "");
                         if (!prop.IsArrayElement && (prop.IsPar || prop.IsCustomized))
                         {
+                            string propBasicName = prop.BasicName.Replace("[]", "");
                             uint id = Behaviac.Design.CRC32.CalcCRC(propBasicName);
                             string agentName = PropertyCppExporter.GetGenerateAgentName(prop, "opl", "attach");
 
@@ -136,8 +136,8 @@ namespace PluginBehaviac.NodeExporters
             }
             else if (attach.IsCompare())
             {
-                ConditionCppExporter.GenerateOperand(stream, indent + "\t\t\t", attach.Opl, "opl", "");
-                ConditionCppExporter.GenerateOperand(stream, indent + "\t\t\t", attach.Opr2, "opr2", "");
+                ConditionCppExporter.GenerateOperand(attachment, stream, indent + "\t\t\t", attach.Opl, "opl", "");
+                ConditionCppExporter.GenerateOperand(attachment, stream, indent + "\t\t\t", attach.Opr2, "opr2", "");
 
                 switch (attach.Operator)
                 {
@@ -182,8 +182,8 @@ namespace PluginBehaviac.NodeExporters
                     {
                         string typeName = DataCppExporter.GetGeneratedNativeType(attach.Opr1.ValueType);
 
-                        RightValueCppExporter.GenerateCode(attach.Opr1, stream, indent + "\t\t\t", typeName, "opr1", "opr1");
-                        RightValueCppExporter.GenerateCode(attach.Opr2, stream, indent + "\t\t\t", typeName, "opr2", "opr2");
+                        RightValueCppExporter.GenerateCode(attachment, attach.Opr1, stream, indent + "\t\t\t", typeName, "opr1", "opr1");
+                        RightValueCppExporter.GenerateCode(attachment, attach.Opr2, stream, indent + "\t\t\t", typeName, "opr2", "opr2");
 
                         string oprStr = string.Empty;
                         switch (attach.Operator)
@@ -211,12 +211,12 @@ namespace PluginBehaviac.NodeExporters
 
                         oprStr = string.Format("({0})({1})", typeName, oprStr);
 
-                        string property = PropertyCppExporter.GetProperty(prop, attach.Opl.Var.ArrayIndexElement, stream, indent + "\t\t\t", "opl", "attach");
+                        string property = PropertyCppExporter.GetProperty(attachment, prop, attach.Opl.Var.ArrayIndexElement, stream, indent + "\t\t\t", "opl", "attach");
                         string propName = prop.BasicName.Replace("[]", "");
 
                         if (prop.IsArrayElement && attach.Opl.Var.ArrayIndexElement != null)
                         {
-                            ParameterCppExporter.GenerateCode(attach.Opl.Var.ArrayIndexElement, stream, indent + "\t\t\t", "int", "opl_index", "attach_opl");
+                            ParameterCppExporter.GenerateCode(attachment, attach.Opl.Var.ArrayIndexElement, stream, indent + "\t\t\t", "int", "opl_index", "attach_opl");
                             property = string.Format("({0})[opl_index]", property);
                         }
 

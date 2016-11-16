@@ -6,6 +6,127 @@ using System.Collections.Generic;
 
 namespace behaviac
 {
+	public class CompareValue_eGameForce : ICompareValue<eGameForce>
+	{
+		public override bool Equal(eGameForce lhs, eGameForce rhs)
+		{
+			return lhs == rhs;
+		}
+		public override bool NotEqual(eGameForce lhs, eGameForce rhs)
+		{
+			return lhs != rhs;
+		}
+		public override bool Greater(eGameForce lhs, eGameForce rhs)
+		{
+			return lhs > rhs;
+		}
+		public override bool GreaterEqual(eGameForce lhs, eGameForce rhs)
+		{
+			return lhs >= rhs;
+		}
+		public override bool Less(eGameForce lhs, eGameForce rhs)
+		{
+			return lhs < rhs;
+		}
+		public override bool LessEqual(eGameForce lhs, eGameForce rhs)
+		{
+			return lhs <= rhs;
+		}
+	}
+
+	public class CompareValue_eMapDirection : ICompareValue<eMapDirection>
+	{
+		public override bool Equal(eMapDirection lhs, eMapDirection rhs)
+		{
+			return lhs == rhs;
+		}
+		public override bool NotEqual(eMapDirection lhs, eMapDirection rhs)
+		{
+			return lhs != rhs;
+		}
+		public override bool Greater(eMapDirection lhs, eMapDirection rhs)
+		{
+			return lhs > rhs;
+		}
+		public override bool GreaterEqual(eMapDirection lhs, eMapDirection rhs)
+		{
+			return lhs >= rhs;
+		}
+		public override bool Less(eMapDirection lhs, eMapDirection rhs)
+		{
+			return lhs < rhs;
+		}
+		public override bool LessEqual(eMapDirection lhs, eMapDirection rhs)
+		{
+			return lhs <= rhs;
+		}
+	}
+
+	public class CompareValue_eBrickType : ICompareValue<eBrickType>
+	{
+		public override bool Equal(eBrickType lhs, eBrickType rhs)
+		{
+			return lhs == rhs;
+		}
+		public override bool NotEqual(eBrickType lhs, eBrickType rhs)
+		{
+			return lhs != rhs;
+		}
+		public override bool Greater(eBrickType lhs, eBrickType rhs)
+		{
+			return lhs > rhs;
+		}
+		public override bool GreaterEqual(eBrickType lhs, eBrickType rhs)
+		{
+			return lhs >= rhs;
+		}
+		public override bool Less(eBrickType lhs, eBrickType rhs)
+		{
+			return lhs < rhs;
+		}
+		public override bool LessEqual(eBrickType lhs, eBrickType rhs)
+		{
+			return lhs <= rhs;
+		}
+	}
+
+	public class CompareValue_UnityEngine_Vector3 : ICompareValue<UnityEngine.Vector3>
+	{
+		public override bool Equal(UnityEngine.Vector3 lhs, UnityEngine.Vector3 rhs)
+		{
+			return (lhs.x == rhs.x) && (lhs.y == rhs.y) && (lhs.z == rhs.z);
+		}
+		public override bool NotEqual(UnityEngine.Vector3 lhs, UnityEngine.Vector3 rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_UnityEngine_Color : ICompareValue<UnityEngine.Color>
+	{
+		public override bool Equal(UnityEngine.Color lhs, UnityEngine.Color rhs)
+		{
+			return (lhs.r == rhs.r) && (lhs.g == rhs.g) && (lhs.b == rhs.b) && (lhs.a == rhs.a);
+		}
+		public override bool NotEqual(UnityEngine.Color lhs, UnityEngine.Color rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+	public class CompareValue_UnityEngine_Transform : ICompareValue<UnityEngine.Transform>
+	{
+		public override bool Equal(UnityEngine.Transform lhs, UnityEngine.Transform rhs)
+		{
+			return lhs == rhs;
+		}
+		public override bool NotEqual(UnityEngine.Transform lhs, UnityEngine.Transform rhs)
+		{
+			return !Equal(lhs, rhs);
+		}
+	}
+
+
 	partial class AgentMeta
 	{
 		private class CMethod_behaviac_Agent_VectorAdd : CAgentMethodVoidBase
@@ -594,6 +715,12 @@ namespace behaviac
 			AgentMeta.Register<UnityEngine.Transform>("UnityEngine.Transform");
 			AgentMeta.Register<UnityEngine.Vector3>("UnityEngine.Vector3");
 
+			ComparerRegister.RegisterType<eGameForce, CompareValue_eGameForce>();
+			ComparerRegister.RegisterType<eMapDirection, CompareValue_eMapDirection>();
+			ComparerRegister.RegisterType<eBrickType, CompareValue_eBrickType>();
+			ComparerRegister.RegisterType<UnityEngine.Vector3, CompareValue_UnityEngine_Vector3>();
+			ComparerRegister.RegisterType<UnityEngine.Color, CompareValue_UnityEngine_Color>();
+			ComparerRegister.RegisterType<UnityEngine.Transform, CompareValue_UnityEngine_Transform>();
 		}
 
 		static partial void unRegisterMeta()
